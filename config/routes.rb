@@ -1,3 +1,5 @@
 Spree::Core::Engine.routes.draw do
-  # Add your extension routes here
+  namespace :global_collect_hml do
+    resource :credit_card_payment, only: :create
+  end
 end
