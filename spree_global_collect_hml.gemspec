@@ -28,4 +28,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'simplecov'
   s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'poltergeist', '~> 1.6.0'
+  s.add_development_dependency 'launchy', '~> 2.4.3'
 end
