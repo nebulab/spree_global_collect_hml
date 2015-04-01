@@ -4,6 +4,10 @@ module SpreeGlobalCollectHml
     isolate_namespace Spree
     engine_name 'spree_global_collect_hml'
 
+    initializer "spree.gateway.payment_methods", :after => "spree.register.payment_methods" do |app|
+      app.config.spree.payment_methods << Spree::Gateway::GlobalCollectHml
+    end
+
     # use rspec for tests
     config.generators do |g|
       g.test_framework :rspec
