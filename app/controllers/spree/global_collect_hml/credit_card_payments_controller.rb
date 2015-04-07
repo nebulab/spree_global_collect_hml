@@ -6,9 +6,10 @@ module Spree
       order = current_order || raise(ActiveRecord::RecordNotFound)
 
       begin
-        response = provider.insert_orderwithpayment(order)[:xml][:request][:response]
+        response = provider.insert_orderwithpayment(order, global_collect_hml_credit_card_payment_confirm_url)[:xml][:request][:response]
 
         if response[:result] == 'OK'
+          store_global_collect_session_data(response)
           redirect_to response[:row][:formaction]
         else
           flash[:error] = Spree.t('flash.generic_error')
@@ -20,7 +21,18 @@ module Spree
       end
     end
 
+    def confirm
+      fail 'implement confirm logic here'
+    end
+
     private
+
+    def store_global_collect_session_data(response)
+      session[:global_collect] = {
+        ref: response[:row][:ref],
+        returnmac: response[:row][:returnmac]
+      }
+    end
 
     def payment_method
       Spree::PaymentMethod.find(params[:payment_method_id])

@@ -27,7 +27,7 @@ module Spree
       #       application server back to notify everything is ok
     end
 
-    def insert_orderwithpayment(order)
+    def insert_orderwithpayment(order, return_url)
       xml = Gyoku.xml(
         { xml: { request: {
           action: 'INSERT_ORDERWITHPAYMENT',
@@ -42,6 +42,7 @@ module Spree
               firstname: order.bill_address.firstname,
               surname: order.bill_address.lastname,
               languagecode: 'en',
+              returnurl: return_url,
               paymentproductid: 1
             },
             payment: {
@@ -52,6 +53,7 @@ module Spree
               surname: order.bill_address.lastname,
               languagecode: 'en',
               paymentproductid: 1,
+              returnurl: return_url,
               hostedindicator: 1
             }
           }
