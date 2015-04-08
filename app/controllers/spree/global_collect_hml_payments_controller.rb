@@ -12,7 +12,12 @@ module Spree
 
       if response && response[:result] == 'OK'
         store_global_collect_session_data(response)
-        redirect_to response[:row][:formaction]
+        @global_collect_url = response[:row][:formaction]
+
+        respond_to do |format|
+          format.html { redirect_to @global_collect_url }
+          format.js
+        end
       else
         flash[:error] = Spree.t('flash.generic_error')
         redirect_to checkout_state_path(:payment)
