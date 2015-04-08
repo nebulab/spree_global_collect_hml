@@ -20,20 +20,23 @@ module Spree
     end
 
     def confirm
-      response = provider.get_orderstatus(current_order)
+      current_order.payments.create!({
+        source: Spree::GlobalCollectCheckout.create(
+          order_number: current_order.number.gsub(/[^0-9]/i, '')
+        ),
+        amount: current_order.total,
+        payment_method: payment_method
+      })
+      current_order.next
 
-      if response && response[:result] == 'OK'
-        provider.purchase(current_order)
-
-        if current_order.complete?
-          flash.notice = Spree.t(:order_processed_successfully)
-          flash[:commerce_tracking] = "nothing special"
-          session[:order_id] = nil
-          redirect_to(completion_route(current_order)) and return
-        end
+      if current_order.complete?
+        flash.notice = Spree.t(:order_processed_successfully)
+        flash[:commerce_tracking] = "nothing special"
+        session[:order_id] = nil
+        redirect_to order_path(current_order, token: current_order.guest_token)
+      else
+        redirect_to checkout_state_path(current_order.state)
       end
-
-      redirect_to checkout_state_path(current_order.state)
     end
 
     private

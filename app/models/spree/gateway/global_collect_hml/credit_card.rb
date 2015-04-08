@@ -22,19 +22,32 @@ module Spree
       self
     end
 
-    def purchase(order)
-      order.payments.create!(amount: order.total, payment_method: self)
-      order.next
+    def purchase(amount, source, gateway_options={})
+      response = provider.get_orderstatus(source.order_number)
+
+      if response && response[:result] == 'OK'
+        Class.new do
+          def success?; true; end
+          def authorization; nil; end
+        end.new
+      else
+        class << response
+          def to_s
+            errors.map(&:long_message).join(" ")
+          end
+        end
+        response
+      end
     end
 
-    def get_orderstatus(order)
+    def get_orderstatus(order_number)
       xml = Gyoku.xml(
         { xml: { request: {
           action: 'GET_ORDERSTATUS',
           meta: { merchantid: preferred_merchant_id },
           params: {
             order: {
-              orderid: order.number.gsub(/[^0-9]/i, ''),
+              orderid: order_number.gsub(/[^0-9]/i, ''),
             }
           }
         }}}, { key_converter: :upcase })
