@@ -47,7 +47,7 @@ module Spree
           meta: { merchantid: preferred_merchant_id },
           params: {
             order: {
-              orderid: order_number.gsub(/[^0-9]/i, ''),
+              orderid: order_number,
             }
           }
         }}}, { key_converter: :upcase })
@@ -62,9 +62,9 @@ module Spree
           meta: { merchantid: preferred_merchant_id },
           params: {
             order: {
-              orderid: order.number.gsub(/[^0-9]/i, ''),
+              orderid: order.global_collect_number,
               merchantreference: rand(Time.now.to_i).to_s.slice(0..29),
-              amount: order.total.to_s.gsub('.', ''),
+              amount: order.global_collect_total,
               currencycode: order.currency,
               countrycode: order.bill_address.country.iso,
               firstname: order.bill_address.firstname,
