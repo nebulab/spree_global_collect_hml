@@ -22,9 +22,24 @@ module Spree
       self
     end
 
-    def purchase
-      # TODO: implement... this needs to be called when Global Collect calls the
-      #       application server back to notify everything is ok
+    def purchase(order)
+      order.payments.create!(amount: order.total, payment_method: self)
+      order.next
+    end
+
+    def get_orderstatus(order)
+      xml = Gyoku.xml(
+        { xml: { request: {
+          action: 'GET_ORDERSTATUS',
+          meta: { merchantid: preferred_merchant_id },
+          params: {
+            order: {
+              orderid: order.number.gsub(/[^0-9]/i, ''),
+            }
+          }
+        }}}, { key_converter: :upcase })
+
+      parse_xml_response(post_xml(endpoint_url, xml))
     end
 
     def insert_orderwithpayment(order, return_url)
@@ -59,14 +74,20 @@ module Spree
           }
         }}}, { key_converter: :upcase })
 
-      parser = Nori.new(convert_tags_to: ->(tag) { tag.downcase.to_sym })
-      parser.parse(post_xml(endpoint_url, xml))
+      parse_xml_response(post_xml(endpoint_url, xml))
     end
 
     private
 
     def endpoint_url
       preferred_test_mode ? TEST_URL : LIVE_URL
+    end
+
+    def parse_xml_response(xml_string)
+      parser = Nori.new(convert_tags_to: ->(tag) { tag.downcase.to_sym })
+
+      parser.parse(xml_string)
+        .try(:[], :xml).try(:[], :request).try(:[], :response)
     end
 
     def post_xml(url_string, xml_string)
