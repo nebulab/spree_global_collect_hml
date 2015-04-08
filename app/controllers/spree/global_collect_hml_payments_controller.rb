@@ -1,5 +1,5 @@
 module Spree
-  class GlobalCollectHml::CreditCardPaymentsController < StoreController
+  class GlobalCollectHmlPaymentsController < StoreController
     before_filter :validate_current_order!
     before_filter :validate_ref_and_returnmac!, only: :confirm
 
@@ -8,7 +8,7 @@ module Spree
                 Net::ProtocolError, SocketError, with: :connection_errors
 
     def create
-      response = provider.insert_orderwithpayment(current_order, global_collect_hml_credit_card_payments_confirm_url(payment_method_id: payment_method.id))
+      response = provider.insert_orderwithpayment(current_order, global_collect_hml_payments_confirm_url(payment_method_id: payment_method.id))
 
       if response && response[:result] == 'OK'
         store_global_collect_session_data(response)

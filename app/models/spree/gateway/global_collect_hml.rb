@@ -1,5 +1,5 @@
 module Spree
-  class Gateway::GlobalCollectHml::CreditCard < Gateway
+  class Gateway::GlobalCollectHml < Gateway
     TEST_URL = 'https://ps.gcsip.nl/wdl/wdl'
     LIVE_URL = 'https://ps.gcsip.com/wdl/wdl'
 
@@ -7,7 +7,7 @@ module Spree
     preference :test_mode, :boolean, default: false
 
     def method_type
-      'global_collect_hml_credit_card'
+      'global_collect_hml'
     end
 
     def supports?(source)
