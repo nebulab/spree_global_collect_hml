@@ -1,3 +1,8 @@
 en:
-  global_collect:
-    pay_with: "Pay with Global Collect"
+  spree:
+    global_collect:
+      submit_order: "Submit order"
+  helpers:
+    label:
+      global_collect:
+        payment_product: "Payment method"

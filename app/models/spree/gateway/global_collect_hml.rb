@@ -5,6 +5,9 @@ module Spree
 
     preference :merchant_id, :string
     preference :test_mode, :boolean, default: false
+    preference :payment_products, :hash, default: {
+      visa: 1, mastercard: 3
+    }
 
     def method_type
       'global_collect_hml'
@@ -55,7 +58,7 @@ module Spree
       parse_xml_response(post_xml(endpoint_url, xml))
     end
 
-    def insert_orderwithpayment(order, return_url)
+    def insert_orderwithpayment(order, payment_product, return_url)
       xml = Gyoku.xml(
         { xml: { request: {
           action: 'INSERT_ORDERWITHPAYMENT',
@@ -71,7 +74,7 @@ module Spree
               surname: order.bill_address.lastname,
               languagecode: 'en',
               returnurl: return_url,
-              paymentproductid: 1
+              paymentproductid: payment_product
             },
             payment: {
               amount: order.total.to_s.gsub('.', ''),
@@ -80,7 +83,7 @@ module Spree
               firstname: order.bill_address.firstname,
               surname: order.bill_address.lastname,
               languagecode: 'en',
-              paymentproductid: 1,
+              paymentproductid: payment_product,
               returnurl: return_url,
               hostedindicator: 1
             }
