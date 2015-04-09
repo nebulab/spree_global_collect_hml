@@ -32,6 +32,11 @@ module Spree
         amount: current_order.total,
         payment_method: payment_method
       })
+
+      render layout: false
+    end
+
+    def complete
       current_order.next
 
       if current_order.complete?
