@@ -71,8 +71,8 @@ module Spree
     end
 
     def validate_ref_and_returnmac!
-      (session[:global_collect]['ref'] == params['REF'] &&
-        session[:global_collect]['returnmac'] == params['RETURNMAC']) ||
+      (session[:global_collect][:ref] == params['REF'] &&
+        session[:global_collect][:returnmac] == params['RETURNMAC']) ||
         fail(ActiveRecord::RecordNotFound)
     end
 
