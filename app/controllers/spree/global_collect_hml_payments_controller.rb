@@ -43,9 +43,9 @@ module Spree
       current_order.next
 
       if current_order.complete?
+        @current_order = nil
         flash.notice = Spree.t(:order_processed_successfully)
-        flash[:commerce_tracking] = "nothing special"
-        session[:order_id] = nil
+        flash['order_completed'] = true
         redirect_to order_path(current_order, token: current_order.guest_token)
       else
         redirect_to checkout_state_path(current_order.state)
