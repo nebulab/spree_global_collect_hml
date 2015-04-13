@@ -2,6 +2,7 @@ en:
   spree:
     global_collect:
       submit_order: "Submit order"
+      payment_error: "There has been an error processing your payment"
   helpers:
     label:
       global_collect:

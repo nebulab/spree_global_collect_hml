@@ -13,9 +13,9 @@ module Spree
         global_collect_hml_payments_confirm_url(payment_method_id: payment_method.id)
       )
 
-      if response && response[:result] == 'OK'
+      if response.success?
         store_global_collect_session_data(response)
-        @global_collect_url = response[:row][:formaction]
+        @global_collect_url = response[:formaction]
 
         respond_to do |format|
           format.html { redirect_to @global_collect_url }
@@ -40,15 +40,16 @@ module Spree
     end
 
     def complete
-      current_order.next
+      order = current_order
+      order.next
 
-      if current_order.complete?
+      if order.complete?
         @current_order = nil
         flash.notice = Spree.t(:order_processed_successfully)
         flash['order_completed'] = true
-        redirect_to order_path(current_order, token: current_order.guest_token)
+        redirect_to order_path(order, token: order.guest_token)
       else
-        redirect_to checkout_state_path(current_order.state)
+        redirect_to checkout_state_path(order.state)
       end
     end
 
@@ -60,9 +61,9 @@ module Spree
     end
 
     def store_global_collect_session_data(response)
-      session[:global_collect] = {
-        ref: response[:row][:ref],
-        returnmac: response[:row][:returnmac]
+      session['global_collect'] = {
+        'ref' => response[:ref],
+        'returnmac' => response[:returnmac]
       }
     end
 
@@ -71,8 +72,8 @@ module Spree
     end
 
     def validate_ref_and_returnmac!
-      (session[:global_collect][:ref] == params['REF'] &&
-        session[:global_collect][:returnmac] == params['RETURNMAC']) ||
+      (session['global_collect']['ref'] == params['REF'] &&
+        session['global_collect']['returnmac'] == params['RETURNMAC']) ||
         fail(ActiveRecord::RecordNotFound)
     end
 
