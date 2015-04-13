@@ -35,6 +35,7 @@ module Spree
         end.new
       else
         class << response
+          def authorization; nil; end
           def to_s
             error || Spree.t('global_collect.payment_error')
           end
