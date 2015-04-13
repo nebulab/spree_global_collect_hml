@@ -34,10 +34,12 @@ module Spree
           def authorization; nil; end
         end.new
       else
-        Class.new do
-          def success?; false; end
-          def to_s; Spree.t('global_collect.payment_error'); end
-        end.new
+        class << response
+          def to_s
+            error || Spree.t('global_collect.payment_error')
+          end
+        end
+        response
       end
     end
 

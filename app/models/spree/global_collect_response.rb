@@ -14,15 +14,23 @@ module Spree
     end
 
     def success?
-      response_field.present? && response_field[:result] == 'OK'
+      response_field.present? &&
+        response_field[:result] == 'OK' &&
+        response_field[:row][:errornumber].nil?
     rescue
       false
     end
 
     def paid?
-      success? && response_field[:row][:statusid].to_i >= 80
+      success? && response_field[:row][:statusid].to_i >= 800
     rescue
       false
+    end
+
+    def error
+      response_field[:row][:errormessage]
+    rescue
+      nil
     end
 
     private
