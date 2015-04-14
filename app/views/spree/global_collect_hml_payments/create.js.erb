@@ -1,2 +1,6 @@
-$("[data-hook='global-collect-iframe']").html(
-  $('<iframe src="<%= @global_collect_url %>" width="500" height="300" frameborder="0">'));
+<% if flash[:error].present? %>
+  $('#content').prepend('<div class="flash error"><%=j flash[:error] %></div>');
+<% else %>
+  $("[data-hook='global-collect-iframe']").html(
+    $('<iframe src="<%= @response[:formaction] %>" width="500" height="300" frameborder="0">'));
+<% end %>

@@ -8,22 +8,15 @@ module Spree
                 Net::ProtocolError, SocketError, with: :connection_errors
 
     def create
-      response = provider.insert_orderwithpayment(
+      @response = provider.insert_orderwithpayment(
         current_order, params[:global_collect][:payment_product],
         global_collect_hml_payments_confirm_url(payment_method_id: payment_method.id)
       )
 
-      if response.valid?
+      if @response.valid?
         store_global_collect_session_data(response)
-        @global_collect_url = response[:formaction]
-
-        respond_to do |format|
-          format.html { redirect_to @global_collect_url }
-          format.js
-        end
       else
-        flash[:error] = Spree.t('flash.generic_error')
-        redirect_to checkout_state_path(:payment)
+        flash[:error] = Spree.t('global_collect.connection_error')
       end
     end
 
