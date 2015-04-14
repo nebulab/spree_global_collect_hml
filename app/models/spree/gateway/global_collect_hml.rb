@@ -6,7 +6,7 @@ module Spree
     preference :merchant_id, :string
     preference :test_mode, :boolean, default: false
     preference :payment_products, :hash, default: {
-      visa: 1, mastercard: 3
+      visa: 1, mastercard: 3, 'american express' => 2
     }
 
     def method_type
