@@ -13,7 +13,11 @@ module Spree
       nil
     end
 
-    def success?
+    def to_s
+      @parsed_xml.to_s
+    end
+
+    def valid?
       response_field.present? &&
         response_field[:result] == 'OK' &&
         response_field[:row][:errornumber].nil?
@@ -21,8 +25,8 @@ module Spree
       false
     end
 
-    def paid?
-      success? && response_field[:row][:statusid].to_i >= 800
+    def success?
+      valid? && response_field[:row][:statusid].to_i >= 50
     rescue
       false
     end

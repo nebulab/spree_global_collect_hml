@@ -28,11 +28,11 @@ module Spree
     def purchase(amount, source, gateway_options={})
       response = provider.get_orderstatus(source.order_number)
 
-      if response.paid?
-        Class.new do
-          def success?; true; end
+      if response.success?
+        class << response
           def authorization; nil; end
-        end.new
+        end
+        response
       else
         class << response
           def authorization; nil; end
@@ -55,19 +55,19 @@ module Spree
           merchantreference: rand(Time.now.to_i).to_s.slice(0..29),
           amount: order.global_collect_total,
           currencycode: order.currency,
-          countrycode: order.bill_address.country.iso,
-          firstname: order.bill_address.firstname,
-          surname: order.bill_address.lastname,
+          countrycode: order.bill_address_country.try(:iso),
+          firstname: order.bill_address_firstname,
+          surname: order.bill_address_lastname,
           languagecode: 'en',
           returnurl: return_url,
           paymentproductid: payment_product
         },
         payment: {
-          amount: order.total.to_s.gsub('.', ''),
+          amount: order.global_collect_total,
           currencycode: order.currency,
-          countrycode: order.bill_address.country.iso,
-          firstname: order.bill_address.firstname,
-          surname: order.bill_address.lastname,
+          countrycode: order.bill_address_country.try(:iso),
+          firstname: order.bill_address_firstname,
+          surname: order.bill_address_lastname,
           languagecode: 'en',
           paymentproductid: payment_product,
           returnurl: return_url,

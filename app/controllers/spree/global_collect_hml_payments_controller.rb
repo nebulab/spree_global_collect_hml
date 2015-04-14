@@ -13,7 +13,7 @@ module Spree
         global_collect_hml_payments_confirm_url(payment_method_id: payment_method.id)
       )
 
-      if response.success?
+      if response.valid?
         store_global_collect_session_data(response)
         @global_collect_url = response[:formaction]
 
