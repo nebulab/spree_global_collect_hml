@@ -14,7 +14,7 @@ module Spree
       )
 
       if @response.valid?
-        store_global_collect_session_data(response)
+        store_global_collect_session_data(@response)
       else
         flash[:error] = Spree.t('global_collect.connection_error')
       end

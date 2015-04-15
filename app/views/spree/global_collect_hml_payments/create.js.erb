@@ -1,5 +1,11 @@
 <% if flash[:error].present? %>
-  $('#content').prepend('<div class="flash error"><%=j flash[:error] %></div>');
+  var _error = '<div class="flash error"><%=j flash[:error] %></div>';
+
+  if ($('.flash.error').is('*')) {
+    $('.flash.error').replaceWith(_error);
+  } else {
+    $('#content').prepend(_error);
+  }
 <% else %>
   $("[data-hook='global-collect-iframe']").html(
     $('<iframe src="<%= @response[:formaction] %>" width="500" height="300" frameborder="0">'));

@@ -35,6 +35,7 @@ module Spree
         response
       else
         class << response
+          def success?; false; end
           def authorization; nil; end
           def to_s
             error || Spree.t('global_collect.payment_error')
@@ -57,10 +58,10 @@ module Spree
           currencycode: order.currency,
           countrycode: order.bill_address_country.try(:iso),
           firstname: order.bill_address_global_collect_firstname,
-          surname: order.bill_address_lastname,
+          surname: order.bill_address_global_collect_surname,
           street: order.bill_address_global_collect_street,
           zip: order.bill_address_zipcode,
-          city: order.bill_address_city,
+          city: order.bill_address_global_collect_city,
           state: order.bill_address_state_text,
           email: order.email,
           ipaddresscustomer: order.last_ip_address,
@@ -68,10 +69,10 @@ module Spree
           returnurl: return_url,
           paymentproductid: payment_product,
           shippingfirstname: order.ship_address_global_collect_firstname,
-          shippingsurname: order.ship_address.lastname,
+          shippingsurname: order.ship_address_global_collect_surname,
           shippingstreet: order.ship_address_global_collect_street,
           shippingzip: order.ship_address_zipcode,
-          shippingcity: order.ship_address_city,
+          shippingcity: order.ship_address_global_collect_city,
           shippingstate: order.ship_address_state_text,
           shippingcountrycode: order.ship_address_country.try(:iso)
         },
@@ -80,7 +81,7 @@ module Spree
           currencycode: order.currency,
           countrycode: order.bill_address_country.try(:iso),
           firstname: order.bill_address_global_collect_firstname,
-          surname: order.bill_address_lastname,
+          surname: order.bill_address_global_collect_surname,
           street: order.bill_address_global_collect_street,
           zip: order.bill_address_zipcode,
           state: order.bill_address_state_text,
