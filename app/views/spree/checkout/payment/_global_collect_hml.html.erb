@@ -3,7 +3,8 @@
     <%= label :global_collect, :payment_product %>:
     <%= select :global_collect,
                :payment_product,
-               payment_method.preferred_payment_products, {include_blank: true},
+               payment_method.filtered_product_payments(current_order),
+               {include_blank: true},
                id: 'global-collect-pay-select' %>
   </p>
 

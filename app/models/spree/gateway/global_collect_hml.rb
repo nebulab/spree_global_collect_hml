@@ -13,6 +13,14 @@ module Spree
       'American Express' => 2,
       'Maestro'          => 117
     }
+    preference :payment_product_restrictions, :hash, default: {
+      117 => {
+        currency:  %w(EUR),
+        countries: %w(AL AD AM AT BY BE BA BG CH CY CZ DE DK EE ES FO FI FR GB
+                      GE GI GR HU HR IE IS IT LT LU LV MC MK MT NO NL PL PT RO
+                      RU SE SI SK SM TR UA VA)
+      }
+    }
 
     def method_type
       'global_collect_hml'
@@ -47,6 +55,18 @@ module Spree
           end
         end
         response
+      end
+    end
+
+    def filtered_product_payments(order)
+      return preferred_payment_products if payment_product_unrestricted?
+
+      preferred_payment_products.select do |key, value|
+        restriction = preferred_payment_product_restrictions[value]
+
+        restriction.nil? ||
+          (restriction[:currency].include?(order.currency) &&
+          restriction[:countries].include?(order.bill_address_country.try(:iso)))
       end
     end
 
@@ -101,6 +121,11 @@ module Spree
     end
 
     private
+
+    def payment_product_unrestricted?
+      (preferred_payment_products.invert.keys -
+        preferred_payment_product_restrictions.keys).empty?
+    end
 
     def endpoint_url
       preferred_test_mode ? TEST_URL : LIVE_URL
