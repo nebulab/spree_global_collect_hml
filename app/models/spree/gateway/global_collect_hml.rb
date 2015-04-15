@@ -14,11 +14,11 @@ module Spree
       'Maestro'          => 117
     }
     preference :payment_product_restrictions, :hash, default: {
-      117 => {
-        currency:  %w(EUR),
-        countries: %w(AL AD AM AT BY BE BA BG CH CY CZ DE DK EE ES FO FI FR GB
-                      GE GI GR HU HR IE IS IT LT LU LV MC MK MT NO NL PL PT RO
-                      RU SE SI SK SM TR UA VA)
+      '117' => {
+        'currency'  => %w(EUR),
+        'countries' => %w(AL AD AM AT BY BE BA BG CH CY CZ DE DK EE ES FO FI FR
+                          GB GE GI GR HU HR IE IS IT LT LU LV MC MK MT NO NL PL
+                          PT RO RU SE SI SK SM TR UA VA)
       }
     }
 
