@@ -1,4 +1,10 @@
-<% if flash[:error].present? %>
+<% if @response.valid? %>
+  if ($('.flash.error').is('*')) {
+    $('.flash.error').remove();
+  }
+  $("[data-hook='global-collect-iframe']").html(
+    $('<iframe src="<%= @response[:formaction] %>" width="500" height="300" frameborder="0">'));
+<% else %>
   <% if Rails.env.development? %>
     var _error = '<div class="flash error"><%=j flash[:error] %>:<br /><%=j @response.to_s %></div>';
   <% else %>
@@ -10,7 +16,4 @@
   } else {
     $('#content').prepend(_error);
   }
-<% else %>
-  $("[data-hook='global-collect-iframe']").html(
-    $('<iframe src="<%= @response[:formaction] %>" width="500" height="300" frameborder="0">'));
 <% end %>
