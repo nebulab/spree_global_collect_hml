@@ -6,12 +6,12 @@ module Spree
     preference :merchant_id, :string
     preference :test_mode, :boolean, default: false
     preference :payment_products, :hash, default: {
-      'Visa'             => 1,
-      'Visa Debit'       => 114,
-      'MasterCard'       => 3,
-      'MasterCard Debit' => 119,
-      'American Express' => 2,
-      'Maestro'          => 117
+      'Visa'             => '1',
+      'Visa Debit'       => '114',
+      'MasterCard'       => '3',
+      'MasterCard Debit' => '119',
+      'American Express' => '2',
+      'Maestro'          => '117'
     }
     preference :payment_product_restrictions, :hash, default: {
       '117' => {
@@ -65,8 +65,8 @@ module Spree
         restriction = preferred_payment_product_restrictions[value]
 
         restriction.nil? ||
-          (restriction[:currency].include?(order.currency) &&
-          restriction[:countries].include?(order.bill_address_country.try(:iso)))
+          (restriction['currency'].include?(order.currency) &&
+          restriction['countries'].include?(order.bill_address_country.try(:iso)))
       end
     end
 
