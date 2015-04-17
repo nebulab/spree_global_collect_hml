@@ -5,7 +5,7 @@
   $("[data-hook='global-collect-iframe']").html(
     $('<iframe src="<%= @response[:formaction] %>" width="500" height="300" frameborder="0">'));
 <% else %>
-  <% unless Rails.env.production? %>
+  <% if Rails.env.production? %>
     var _error = '<div class="flash error"><%=j flash[:error] %></div>';
   <% else %>
     var _error = '<div class="flash error"><%=j flash[:error] %>:<br /><%=j @response.to_s %></div>';
