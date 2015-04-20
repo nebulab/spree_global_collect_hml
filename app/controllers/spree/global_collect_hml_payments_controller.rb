@@ -21,13 +21,13 @@ module Spree
     end
 
     def confirm
-      current_order.payments.create!({
+      current_order.payments.create!(
         source: Spree::GlobalCollectCheckout.create(
           order_number: current_order.global_collect_number
         ),
         amount: current_order.total,
         payment_method: payment_method
-      })
+      )
 
       render layout: false
     end

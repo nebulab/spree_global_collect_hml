@@ -8,7 +8,7 @@ module Spree
     end
 
     def [](key)
-      response_field[:row][key]
+      response_field[response_type][key]
     rescue
       nil
     end
@@ -43,6 +43,11 @@ module Spree
       @parsed_xml[:xml][:request][:response]
     rescue
       nil
+    end
+
+    def response_type
+      return :row    if response_field.try(:has_key?, :row)
+      return :status if response_field.try(:has_key?, :status)
     end
   end
 end

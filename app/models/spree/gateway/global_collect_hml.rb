@@ -42,6 +42,8 @@ module Spree
       response = provider.get_orderstatus(source.order_number)
 
       if response.success?
+        source.update_attribute(:payment_product_id, response[:paymentproductid])
+
         class << response
           def authorization; nil; end
         end
@@ -61,13 +63,17 @@ module Spree
     def filtered_product_payments(order)
       return preferred_payment_products if payment_product_unrestricted?
 
-      preferred_payment_products.select do |key, value|
+      preferred_payment_products.select do |_, value|
         restriction = preferred_payment_product_restrictions[value]
 
         restriction.nil? ||
           (restriction['currency'].include?(order.currency) &&
           restriction['countries'].include?(order.bill_address_country.try(:iso)))
       end
+    end
+
+    def payment_product_from_id(payment_product_id)
+      preferred_payment_products.invert[payment_product_id.to_s]
     end
 
     def get_orderstatus(order_number)
