@@ -37,6 +37,10 @@ module Spree
       nil
     end
 
+    def message
+      @raw_xml.to_s
+    end
+
     private
 
     def response_field
