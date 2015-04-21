@@ -12,7 +12,8 @@ module Spree
       'MasterCard Debit' => '119',
       'American Express' => '2',
       'Maestro'          => '117',
-      'Sofort'           => '836'
+      'Sofort'           => '836',
+      'SEPA'             => '770'
     }
     preference :payment_product_restrictions, :hash, default: {
       '117' => {
@@ -24,6 +25,10 @@ module Spree
       '836' => {
         'currency' => %w(EUR),
         'countries' => %w(AT BE CH DE FR GB NL PL)
+      },
+      '770' => {
+        'currency' => %w(EUR),
+        'countries' => %w(AT BE DE ES FR IT NL)
       }
     }
 
@@ -109,7 +114,15 @@ module Spree
         :insert_orderwithpayment,
         order: credit_card_order_params(*args),
         payment: credit_card_payment_params(*args)
+                 .merge(sepa_payment_params)
       )
+    end
+
+    def sepa_payment_params
+      {
+        transactiontype: 'S',
+        directdebittext: "SEPA Payment for #{Spree::Config.site_name}"
+      }
     end
 
     def credit_card_order_params(order, payment_product_id, return_url)
