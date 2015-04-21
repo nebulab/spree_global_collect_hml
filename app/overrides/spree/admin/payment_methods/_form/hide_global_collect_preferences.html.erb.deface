@@ -1,5 +1,5 @@
-<!-- replace "erb[loud]:contains('preference_fields')"
-  original '<%= preference_fields(@object, f) %>' -->
+<!-- surround "erb[loud]:contains('preference_fields')"
+     original "ca5fd5384bf8364f9280e9fde7172baa9239322f"-->
 
 <% if @object.is_a?(Spree::Gateway::GlobalCollectHml) %>
   <%= f.label("preferred_merchant_id", Spree.t(:merchant_id) + ": ") %>
@@ -8,6 +8,5 @@
   <%= f.label("preferred_test_mode", Spree.t(:test_mode) + ": ") %>
   <%= preference_field_for(f, "preferred_test_mode", :type => @object.preference_type(:test_mode)) %>
 <% else %>
-  <%# The original Spree code %>
-  <%= preference_fields(@object, f) %>
+  <%= render_original %>
 <% end %>
