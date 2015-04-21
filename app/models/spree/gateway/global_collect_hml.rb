@@ -11,7 +11,8 @@ module Spree
       'MasterCard'       => '3',
       'MasterCard Debit' => '119',
       'American Express' => '2',
-      'Maestro'          => '117'
+      'Maestro'          => '117',
+      'Sofort'           => '836'
     }
     preference :payment_product_restrictions, :hash, default: {
       '117' => {
@@ -19,6 +20,10 @@ module Spree
         'countries' => %w(AL AD AM AT BY BE BA BG CH CY CZ DE DK EE ES FO FI FR
                           GB GE GI GR HU HR IE IS IT LT LU LV MC MK MT NO NL PL
                           PT RO RU SE SI SK SM TR UA VA)
+      },
+      '836' => {
+        'currency' => %w(EUR),
+        'countries' => %w(AT BE CH DE FR GB NL PL)
       }
     }
 
@@ -80,53 +85,79 @@ module Spree
       global_collect.call(:get_orderstatus, order: { orderid: order_number })
     end
 
-    def insert_orderwithpayment(order, payment_product, return_url)
-      global_collect.call(:insert_orderwithpayment,
-        order: {
-          orderid: order.global_collect_number,
-          merchantreference: rand(Time.now.to_i).to_s.slice(0..29),
-          amount: order.global_collect_total,
-          currencycode: order.currency,
-          countrycode: order.bill_address_country.try(:iso),
-          firstname: order.bill_address_global_collect_firstname,
-          surname: order.bill_address_global_collect_surname,
-          street: order.bill_address_global_collect_street,
-          zip: order.bill_address_zipcode,
-          city: order.bill_address_global_collect_city,
-          state: order.bill_address_state_text,
-          email: order.email,
-          ipaddresscustomer: order.last_ip_address,
-          languagecode: 'en',
-          returnurl: return_url,
-          paymentproductid: payment_product,
-          shippingfirstname: order.ship_address_global_collect_firstname,
-          shippingsurname: order.ship_address_global_collect_surname,
-          shippingstreet: order.ship_address_global_collect_street,
-          shippingzip: order.ship_address_zipcode,
-          shippingcity: order.ship_address_global_collect_city,
-          shippingstate: order.ship_address_state_text,
-          shippingcountrycode: order.ship_address_country.try(:iso)
-        },
-        payment: {
-          amount: order.global_collect_total,
-          currencycode: order.currency,
-          countrycode: order.bill_address_country.try(:iso),
-          firstname: order.bill_address_global_collect_firstname,
-          surname: order.bill_address_global_collect_surname,
-          street: order.bill_address_global_collect_street,
-          zip: order.bill_address_zipcode,
-          state: order.bill_address_state_text,
-          email: order.email,
-          languagecode: 'en',
-          returnurl: return_url,
-          customeripaddress: order.last_ip_address,
-          paymentproductid: payment_product,
-          hostedindicator: 1
-        }
-      )
+    def insert_orderwithpayment(order, payment_product_id, return_url)
+      case payment_product_from_id(payment_product_id)
+      when 'SEPA'
+        pay_with_sepa(order, payment_product_id, return_url)
+      else
+        pay_with_default(order, payment_product_id, return_url)
+      end
     end
 
     private
+
+    def pay_with_default(*args)
+      global_collect.call(
+        :insert_orderwithpayment,
+        order: credit_card_order_params(*args),
+        payment: credit_card_payment_params(*args)
+      )
+    end
+
+    def pay_with_sepa(*args)
+      global_collect.call(
+        :insert_orderwithpayment,
+        order: credit_card_order_params(*args),
+        payment: credit_card_payment_params(*args)
+      )
+    end
+
+    def credit_card_order_params(order, payment_product_id, return_url)
+      {
+        orderid: order.global_collect_number,
+        merchantreference: rand(Time.now.to_i).to_s.slice(0..29),
+        amount: order.global_collect_total,
+        currencycode: order.currency,
+        countrycode: order.bill_address_country.try(:iso),
+        firstname: order.bill_address_global_collect_firstname,
+        surname: order.bill_address_global_collect_surname,
+        street: order.bill_address_global_collect_street,
+        zip: order.bill_address_zipcode,
+        city: order.bill_address_global_collect_city,
+        state: order.bill_address_state_text,
+        email: order.email,
+        ipaddresscustomer: order.last_ip_address,
+        languagecode: 'en',
+        returnurl: return_url,
+        paymentproductid: payment_product_id,
+        shippingfirstname: order.ship_address_global_collect_firstname,
+        shippingsurname: order.ship_address_global_collect_surname,
+        shippingstreet: order.ship_address_global_collect_street,
+        shippingzip: order.ship_address_zipcode,
+        shippingcity: order.ship_address_global_collect_city,
+        shippingstate: order.ship_address_state_text,
+        shippingcountrycode: order.ship_address_country.try(:iso)
+      }
+    end
+
+    def credit_card_payment_params(order, payment_product_id, return_url)
+      {
+        amount: order.global_collect_total,
+        currencycode: order.currency,
+        countrycode: order.bill_address_country.try(:iso),
+        firstname: order.bill_address_global_collect_firstname,
+        surname: order.bill_address_global_collect_surname,
+        street: order.bill_address_global_collect_street,
+        zip: order.bill_address_zipcode,
+        state: order.bill_address_state_text,
+        email: order.email,
+        languagecode: 'en',
+        returnurl: return_url,
+        customeripaddress: order.last_ip_address,
+        paymentproductid: payment_product_id,
+        hostedindicator: 1
+      }
+    end
 
     def payment_product_unrestricted?
       (preferred_payment_products.invert.keys -

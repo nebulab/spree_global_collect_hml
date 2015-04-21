@@ -26,7 +26,7 @@ module Spree
     end
 
     def success?
-      valid? && response_field[:row][:statusid].to_i >= 50
+      valid? && response_field[:row][:statusid].to_i >= 600
     rescue
       false
     end
