@@ -52,7 +52,13 @@ module Spree
       response = provider.get_orderstatus(source.order_number)
 
       if response.success?
-        source.update_attribute(:payment_product_id, response[:paymentproductid])
+        source.update_attributes(
+          payment_product_id: response[:paymentproductid],
+          effort_id: response[:effortid],
+          attempt_id: response[:attemptid],
+          payment_method_id: response[:paymentmethodid],
+          payment_reference: response[:paymentreference]
+        )
 
         class << response
           def authorization; nil; end
