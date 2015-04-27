@@ -1,6 +1,6 @@
 module Spree
   class GlobalCollectHmlPaymentsController < StoreController
-    before_filter :validate_current_order!
+    before_filter :validate_current_order!, except: :complete
     before_filter :validate_ref_and_returnmac!, only: :confirm
 
     rescue_from Timeout::Error, Errno::EINVAL, Errno::ECONNRESET,
@@ -21,7 +21,9 @@ module Spree
     end
 
     def confirm
-      current_order.payments.create!(
+      @order = current_order
+
+      @order.payments.create!(
         source: Spree::GlobalCollectCheckout.create(
           order_number: current_order.global_collect_number
         ),
@@ -29,12 +31,13 @@ module Spree
         payment_method: payment_method
       )
 
+      @order.next
+
       render layout: false
     end
 
     def complete
-      order = current_order
-      order.next
+      order = current_order || Spree::Order.find_by_number(params[:order_id])
 
       if order.complete?
         @current_order = nil
@@ -42,6 +45,7 @@ module Spree
         flash['order_completed'] = true
         redirect_to order_path(order, token: order.guest_token)
       else
+        flash[:error] = Spree.t('global_collect.payment_error')
         redirect_to checkout_state_path(order.state)
       end
     end
