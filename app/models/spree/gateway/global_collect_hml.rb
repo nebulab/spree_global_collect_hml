@@ -14,8 +14,7 @@ module Spree
       'Maestro'          => '117',
       'Sofort'           => '836',
       'SEPA'             => '770',
-      'Bank Transfer'    => '11',
-      'Bank Refund'      => '1001'
+      'Bank Transfer'    => '11'
     }
     preference :payment_product_restrictions, :hash, default: {
       '117' => {
