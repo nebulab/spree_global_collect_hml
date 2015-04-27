@@ -1,10 +1,13 @@
 ($ document).ready ->
-  $select = ($ '#global-collect-pay-select')
-  $link   = ($ '#global-collect-pay-link')
+  linkClass = '.global-collect-pay-link'
 
-  if $select.is('*') and $link.is('*')
+  $select   = ($ '.global-collect-pay-select')
+  $link     = ($ linkClass)
+
+  if $select.is('*')
     $select.change ->
-      $link.data('payment-product', ($ this).val())
+      elementId = ($ this).data('link')
+      $("#{elementId}").data('payment-product', ($ this).val())
 
     $link.click (event) ->
       paymentProduct = ($ this).data('payment-product')

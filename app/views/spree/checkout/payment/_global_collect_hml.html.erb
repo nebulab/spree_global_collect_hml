@@ -5,12 +5,18 @@
                :payment_product,
                payment_method.filtered_product_payments(current_order),
                {include_blank: true},
-               id: 'global-collect-pay-select' %>
+               class: 'global-collect-pay-select',
+               data: {
+                 link: "#global-collect-pay-link-#{payment_method.id}"
+               } %>
   </p>
 
   <%= link_to Spree.t('global_collect.submit_order'),
-            global_collect_hml_payment_path(payment_method_id: payment_method.id),
-            method: :post, remote: true, id: 'global-collect-pay-link' %>
+        global_collect_hml_payment_path(payment_method_id: payment_method.id),
+        method: :post,
+        remote: true,
+        class: 'global-collect-pay-link',
+        id: "global-collect-pay-link-#{payment_method.id}" %>
 
   <div data-hook="global-collect-iframe"></div>
 </div>
