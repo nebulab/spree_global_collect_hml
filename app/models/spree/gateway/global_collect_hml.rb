@@ -42,17 +42,20 @@ module Spree
     end
 
     def auto_capture?
-      true
+      false
     end
 
     def provider
       self
     end
 
-    def purchase(amount, source, gateway_options={})
+    def authorize(amount, source, gateway_options={})
       response = provider.get_orderstatus(source.order_number)
 
       if response.success?
+        source.payment.update_attributes(
+          response_code: response[:merchantreference]
+        )
         source.update_attributes(
           payment_product_id: response[:paymentproductid],
           effort_id: response[:effortid],
