@@ -2,7 +2,7 @@
   if ($('.flash.error').is('*')) {
     $('.flash.error').remove();
   }
-  $("[data-hook='global-collect-iframe']").html(
+  $("#global-collect-iframe-<%= @payment_method.id %>").html(
     $('<iframe src="<%= @response[:formaction] %>" width="500" height="300" frameborder="0">'));
 <% else %>
   <% if Rails.env.production? %>

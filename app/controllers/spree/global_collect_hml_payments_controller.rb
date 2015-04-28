@@ -8,9 +8,10 @@ module Spree
                 Net::ProtocolError, SocketError, with: :connection_errors
 
     def create
+      @payment_method = payment_method
       @response = provider.insert_orderwithpayment(
         current_order, params[:global_collect][:payment_product],
-        global_collect_hml_payments_confirm_url(payment_method_id: payment_method.id)
+        global_collect_hml_payments_confirm_url(payment_method_id: @payment_method.id)
       )
 
       if @response.valid?
