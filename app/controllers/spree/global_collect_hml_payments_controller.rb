@@ -9,9 +9,11 @@ module Spree
 
     def create
       @payment_method = payment_method
+
       @response = provider.insert_orderwithpayment(
-        current_order, global_collect_params[:payment_product],
-        global_collect_hml_payments_confirm_url(payment_method_id: @payment_method.id)
+        current_order,
+        global_collect_params[:payment_product],
+        global_collect_hml_payments_confirm_url(global_collect: {payment_method_id: @payment_method.id})
       )
 
       if @response.valid?
