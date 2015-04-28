@@ -10,7 +10,7 @@ module Spree
     def create
       @payment_method = payment_method
       @response = provider.insert_orderwithpayment(
-        current_order, params[:global_collect][:payment_product],
+        current_order, global_collect_params[:payment_product],
         global_collect_hml_payments_confirm_url(payment_method_id: @payment_method.id)
       )
 
@@ -76,7 +76,11 @@ module Spree
     end
 
     def payment_method
-      Spree::PaymentMethod.find(params[:payment_method_id])
+      Spree::PaymentMethod.find(global_collect_params[:payment_method_id])
+    end
+
+    def global_collect_params
+      params[:global_collect]
     end
 
     def provider
