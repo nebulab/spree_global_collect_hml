@@ -12,7 +12,9 @@ Spree::Order.class_eval do
   end
 
   def global_collect_total
-    total.to_s.gsub('.', '')
+    format_opts = { decimal_mark: '', thousands_separator: '', symbol: false }
+
+    Spree::Money.new(total, format_opts).to_s
   end
 
   def address_iso(address_type)
