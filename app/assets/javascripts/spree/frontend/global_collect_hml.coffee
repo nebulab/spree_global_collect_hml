@@ -4,8 +4,8 @@
 
   if $select.is('*')
     $select.change ->
-      linkId = ($ this).parent('select').data('link')
-      $(linkId).attr('data-payment-product', ($ this).val())
+      linkId = ($ this).data('link')
+      $(linkId).data('payment-product', ($ this).val())
 
     $link.click (event) ->
       paymentProduct = ($ this).data('payment-product')
