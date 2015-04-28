@@ -3,6 +3,7 @@ en:
     global_collect:
       link: "View on Global Collect"
       submit_order: "Submit order"
+      payment_captured: "The payment has been succesfully captured"
       payment_error: "There has been an error processing your payment"
       connection_error: "There has been an error connecting to the gateway provider"
       payment_product: "Payment method"

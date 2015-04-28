@@ -37,16 +37,16 @@ module Spree
       'global_collect_hml'
     end
 
-    def supports?(source)
-      true
-    end
-
-    def auto_capture?
-      false
+    def provider_class
+      provider.class
     end
 
     def provider
       self
+    end
+
+    def auto_capture?
+      false
     end
 
     def authorize(amount, source, gateway_options={})
@@ -78,6 +78,10 @@ module Spree
         end
         response
       end
+    end
+
+    def capture(amount, source, gateway_options={})
+      ActiveMerchant::Billing::Response.new(true, Spree.t('global_collect.payment_confirmed'))
     end
 
     def filtered_product_payments(order)
