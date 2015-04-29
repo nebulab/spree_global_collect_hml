@@ -18,6 +18,7 @@ module Spree
 
       if @response.valid?
         store_global_collect_session_data(@response)
+        redirect_to(@response[:formaction]) unless request.xhr?
       else
         flash[:error] = Spree.t('global_collect.connection_error')
       end
