@@ -47,7 +47,7 @@ module Spree
         @current_order = nil
         flash.notice = I18n.t(:order_processed_successfully)
         flash['order_completed'] = true
-        redirect_to order_path(order, token: order.guest_token)
+        redirect_to order_path(order, co_thankyou: true)
       else
         flash[:error] = I18n.t('global_collect.payment_error')
         redirect_to checkout_state_path(order.state)
