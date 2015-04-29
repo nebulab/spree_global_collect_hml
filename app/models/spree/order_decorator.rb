@@ -20,4 +20,12 @@ Spree::Order.class_eval do
   def address_iso(address_type)
     send("#{address_type}_address").try(:country).try(:iso)
   end
+
+  # This is here because by default payment profiles enable the confirm step
+  # but this is not needed with GobalCollect as the user has to confirm the
+  # payment anyway.
+  # Original method: https://github.com/spree/spree/blob/a1172606f27ee2e71f097bf301df9f99881ad2f5/core/app/models/spree/order.rb#L176
+  def confirmation_required?
+    Spree::Config[:always_include_confirm_step] || state == 'confirm'
+  end
 end
