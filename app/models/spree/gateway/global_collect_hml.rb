@@ -51,32 +51,26 @@ module Spree
 
     def authorize(amount, source, gateway_options={})
       response = provider.get_orderstatus(source.order_number)
+      source.update_attributes(
+        payment_product_id: response[:paymentproductid],
+        effort_id:          response[:effortid],
+        attempt_id:         response[:attemptid],
+        payment_method_id:  response[:paymentmethodid],
+        payment_reference:  response[:paymentreference]
+      )
 
       if response.success?
         source.payment.update_attributes(
           response_code: response[:merchantreference]
         )
-        source.update_attributes(
-          payment_product_id: response[:paymentproductid],
-          effort_id: response[:effortid],
-          attempt_id: response[:attemptid],
-          payment_method_id: response[:paymentmethodid],
-          payment_reference: response[:paymentreference]
-        )
 
-        class << response
-          def authorization; nil; end
-        end
-        response
+        ActiveMerchant::Billing::Response.new(
+          true, Spree.t('global_collect.payment_authorized'),
+          gc_response: response.to_s)
       else
-        class << response
-          def success?; false; end
-          def authorization; nil; end
-          def to_s
-            error || Spree.t('global_collect.payment_error')
-          end
-        end
-        response
+        ActiveMerchant::Billing::Response.new(
+          false, response.error || Spree.t('global_collect.payment_error'),
+          gc_response: response.to_s)
       end
     end
 
