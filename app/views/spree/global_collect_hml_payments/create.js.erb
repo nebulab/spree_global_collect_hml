@@ -1,19 +1,23 @@
-<% if @response.valid? %>
-  if ($('.flash.error').is('*')) {
-    $('.flash.error').remove();
-  }
-  $("#global-collect-iframe-<%= @payment_method.id %>").html(
-    $('<iframe src="<%= @response[:formaction] %>" width="500" height="300" frameborder="0">'));
-<% else %>
-  <% if Rails.env.production? %>
-    var _error = '<div class="flash error"><%=j flash[:error] %></div>';
-  <% else %>
-    var _error = '<div class="flash error"><%=j flash[:error] %>:<br /><%=j @response.to_s %></div>';
-  <% end %>
+var flashError, error, iframeUrl
 
-  if ($('.flash.error').is('*')) {
-    $('.flash.error').replaceWith(_error);
+flashError = $('.flash.error')
+
+<% if @response.valid? %>
+  flashError.remove()
+  iframeUrl = '<%=j @response[:formaction] %>'
+
+  $("#global-collect-iframe-<%= @payment_method.id %>").html(
+    $('<iframe src="'+iframeUrl+'" width="500" height="300" frameborder="0">'))
+
+<% else %>
+  error = '<div class="flash error">'+
+            '<%=j flash[:error] %>'+
+            '<%=j @response.to_s unless Rails.env.production? %>'+
+          '</div>';
+
+  if (flashError.is('*')) {
+    flashError.replaceWith(error);
   } else {
-    $('#content').prepend(_error);
+    $('#content').prepend(error);
   }
 <% end %>
