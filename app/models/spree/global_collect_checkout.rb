@@ -1,6 +1,9 @@
 module Spree
   class GlobalCollectCheckout < ActiveRecord::Base
     has_one :payment, class_name: 'Spree::Payment', as: :source
+    attr_accessible :order_number, :effort_id, :attempt_id,
+                    :payment_method_id, :payment_reference,
+                    :payment_product_id
 
     def actions
       %w(capture)

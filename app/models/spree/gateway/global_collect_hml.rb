@@ -33,6 +33,10 @@ module Spree
       }
     }
 
+    attr_accessible :preferred_merchant_id, :preferred_test_mode,
+                    :preferred_payment_products, :preferred_environment,
+                    :preferred_payment_product_restrictions
+
     def method_type
       'global_collect_hml'
     end
@@ -65,17 +69,17 @@ module Spree
         )
 
         ActiveMerchant::Billing::Response.new(
-          true, Spree.t('global_collect.payment_authorized'),
+          true, I18n.t('global_collect.payment_authorized'),
           gc_response: response.to_s)
       else
         ActiveMerchant::Billing::Response.new(
-          false, response.error || Spree.t('global_collect.payment_error'),
+          false, response.error || I18n.t('global_collect.payment_error'),
           gc_response: response.to_s)
       end
     end
 
     def capture(amount, source, gateway_options={})
-      ActiveMerchant::Billing::Response.new(true, Spree.t('global_collect.payment_confirmed'))
+      ActiveMerchant::Billing::Response.new(true, I18n.t('global_collect.payment_confirmed'))
     end
 
     def filtered_product_payments(order)
@@ -137,7 +141,7 @@ module Spree
       {
         orderid: order.global_collect_number,
         merchantreference: rand(Time.now.to_i).to_s.slice(0..29),
-        amount: order.global_collect_total,
+        amount: order.global_collect_total.to_i,
         currencycode: order.currency,
         countrycode: order.bill_address_country.try(:iso),
         firstname: order.bill_address_global_collect_firstname,
@@ -163,7 +167,7 @@ module Spree
 
     def credit_card_payment_params(order, payment_product_id, return_url)
       {
-        amount: order.global_collect_total,
+        amount: order.global_collect_total.to_i,
         currencycode: order.currency,
         countrycode: order.bill_address_country.try(:iso),
         firstname: order.bill_address_global_collect_firstname,

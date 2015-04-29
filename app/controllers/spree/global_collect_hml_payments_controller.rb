@@ -20,7 +20,7 @@ module Spree
         store_global_collect_session_data(@response)
         redirect_to(@response[:formaction]) unless request.xhr?
       else
-        flash[:error] = Spree.t('global_collect.connection_error')
+        flash[:error] = I18n.t('global_collect.connection_error')
       end
     end
 
@@ -31,7 +31,7 @@ module Spree
         source: Spree::GlobalCollectCheckout.create(
           order_number: current_order.global_collect_number
         ),
-        amount: current_order.total,
+        amount: current_order.total.to_i,
         payment_method: payment_method
       )
 
@@ -45,11 +45,11 @@ module Spree
 
       if order.complete?
         @current_order = nil
-        flash.notice = Spree.t(:order_processed_successfully)
+        flash.notice = I18n.t(:order_processed_successfully)
         flash['order_completed'] = true
         redirect_to order_path(order, token: order.guest_token)
       else
-        flash[:error] = Spree.t('global_collect.payment_error')
+        flash[:error] = I18n.t('global_collect.payment_error')
         redirect_to checkout_state_path(order.state)
       end
     end
@@ -57,7 +57,7 @@ module Spree
     private
 
     def connection_errors
-      flash[:error] = Spree.t('flash.connection_failed')
+      flash[:error] = I18n.t('flash.connection_failed')
       redirect_to checkout_state_path(current_order.state)
     end
 

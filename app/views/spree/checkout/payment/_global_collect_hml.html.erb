@@ -11,7 +11,7 @@
                } %>
   </p>
 
-  <%= link_to Spree.t('global_collect.submit_order'),
+  <%= link_to I18n.t('global_collect.submit_order'),
         global_collect_hml_payment_path(global_collect: { payment_method_id: payment_method.id }),
         method: :post,
         remote: true,
