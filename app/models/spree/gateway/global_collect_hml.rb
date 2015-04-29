@@ -49,6 +49,10 @@ module Spree
       false
     end
 
+    def payment_profiles_supported?
+      true
+    end
+
     def authorize(amount, source, gateway_options={})
       response = provider.get_orderstatus(source.order_number)
       source.update_attributes(
@@ -78,6 +82,16 @@ module Spree
       ActiveMerchant::Billing::Response.new(true, Spree.t('global_collect.payment_confirmed'))
     end
 
+    def create_profile(payment)
+      return if payment.source.has_payment_profile?
+
+      response = provider.convert_paymenttoprofile(payment.source.order_number)
+
+      if response[:profiletoken].present?
+        payment.source.update_attributes(profile_token: response[:profiletoken])
+      end
+    end
+
     def filtered_product_payments(order)
       return preferred_payment_products if payment_product_unrestricted?
 
@@ -96,6 +110,10 @@ module Spree
 
     def get_orderstatus(order_number)
       global_collect.call(:get_orderstatus, order: { orderid: order_number })
+    end
+
+    def convert_paymenttoprofile(order_number)
+      global_collect.call(:convert_paymenttoprofile, payment: { orderid: order_number })
     end
 
     def insert_orderwithpayment(order, payment_product_id, return_url)
