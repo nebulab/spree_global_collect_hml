@@ -13,15 +13,14 @@ module Spree
       @response = provider.insert_orderwithpayment(
         current_order,
         global_collect_params[:payment_product],
-        global_collect_hml_payments_confirm_url(global_collect: {payment_method_id: @payment_method.id})
+        global_collect_hml_payments_confirm_url(
+          global_collect: { payment_method_id: @payment_method.id })
       )
 
       if @response.valid?
         store_global_collect_session_data(@response)
-        redirect_to(@response[:formaction]) unless request.xhr?
       else
         flash[:error] = Spree.t('global_collect.connection_error')
-        redirect_to checkout_state_path(current_order.state) unless request.xhr?
       end
     end
 
@@ -29,11 +28,12 @@ module Spree
       @order = current_order
 
       @order.payments.create!(
-        source: Spree::GlobalCollectCheckout.create(
-          order_number: current_order.global_collect_number
+        source: GlobalCollectCheckout.create(
+          order_number:      @order.global_collect_number,
+          user_id:           @order.user_id,
+          payment_method_id: payment_method.try(:id)
         ),
-        amount: current_order.total,
-        payment_method: payment_method
+        amount: @order.total, payment_method: payment_method
       )
 
       @order.next
@@ -42,7 +42,7 @@ module Spree
     end
 
     def complete
-      order = current_order || Spree::Order.find_by_number(params[:order_id])
+      order = current_order || Order.find_by_number(params[:order_id])
 
       if order.complete?
         @current_order = nil
@@ -80,7 +80,7 @@ module Spree
     end
 
     def payment_method
-      Spree::PaymentMethod.find(global_collect_params[:payment_method_id])
+      @pm ||= PaymentMethod.find(global_collect_params[:payment_method_id])
     end
 
     def global_collect_params

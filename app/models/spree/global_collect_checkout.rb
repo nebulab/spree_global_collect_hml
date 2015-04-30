@@ -2,6 +2,8 @@ module Spree
   class GlobalCollectCheckout < ActiveRecord::Base
     has_one :payment, class_name: 'Spree::Payment', as: :source
 
+    scope :with_payment_profile, -> { where('profile_token IS NOT NULL') }
+
     def actions
       %w(capture)
     end

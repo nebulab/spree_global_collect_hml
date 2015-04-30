@@ -33,6 +33,8 @@ module Spree
       }
     }
 
+    has_many :sources, class_name: 'Spree::GlobalCollectCheckout'
+
     def method_type
       'global_collect_hml'
     end
@@ -51,6 +53,22 @@ module Spree
 
     def payment_profiles_supported?
       true
+    end
+
+    def payment_source_class
+      Spree::GlobalCollectCheckout
+    end
+
+    def reusable_sources(order)
+      if order.completed?
+        sources_by_order order
+      else
+        if order.user_id
+          sources.where(user_id: order.user_id).with_payment_profile
+        else
+          []
+        end
+      end
     end
 
     def authorize(amount, source, gateway_options={})
