@@ -1,0 +1,12 @@
+<% if @response.valid? %>
+{
+  "location": "<%=j @response[:formaction] %>"
+}
+<% else %>
+{
+  <% unless Rails.env.production? %>
+    "debug": "<%=j @response.to_s %>",
+  <% end %>
+  "errorMessage": "<%=j flash[:error] %>"
+}
+<% end %>
