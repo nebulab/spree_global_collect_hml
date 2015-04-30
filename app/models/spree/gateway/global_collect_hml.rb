@@ -37,7 +37,9 @@ module Spree
     preference :payment_products, :hash, default: PAYMENT_PRODUCTS
     preference :payment_product_restrictions, :hash, default: PAYMENT_PRODUCTS_RESTRICTIONS
 
-    has_many :sources, class_name: 'Spree::GlobalCollectCheckout'
+    has_many :global_collect_checkouts,
+             class_name: 'Spree::GlobalCollectCheckout',
+             foreign_key: 'payment_method_id'
 
     def method_type
       'global_collect_hml'
@@ -68,7 +70,8 @@ module Spree
         sources_by_order order
       else
         if order.user_id
-          sources.where(user_id: order.user_id).with_payment_profile
+          global_collect_checkouts
+            .where(user_id: order.user_id).with_payment_profile
         else
           []
         end
@@ -78,11 +81,11 @@ module Spree
     def authorize(amount, source, gateway_options={})
       response = provider.get_orderstatus(source.order_number)
       source.update_attributes(
-        payment_product_id: response[:paymentproductid],
-        effort_id:          response[:effortid],
-        attempt_id:         response[:attemptid],
-        payment_method_id:  response[:paymentmethodid],
-        payment_reference:  response[:paymentreference]
+        payment_product_id:   response[:paymentproductid],
+        effort_id:            response[:effortid],
+        attempt_id:           response[:attemptid],
+        gc_payment_method_id: response[:paymentmethodid],
+        payment_reference:    response[:paymentreference]
       )
 
       if response.success?
@@ -138,30 +141,30 @@ module Spree
       global_collect.call(:convert_paymenttoprofile, payment: { orderid: order_number })
     end
 
-    def insert_orderwithpayment(order, payment_product_id, return_url)
+    def insert_orderwithpayment(order, payment_product_id, return_url, reuse_profile)
       case payment_product_from_id(payment_product_id)
       when 'SEPA'
-        pay_with_sepa(order, payment_product_id, return_url)
+        pay_with_sepa(order, payment_product_id, return_url, reuse_profile)
       else
-        pay_with_default(order, payment_product_id, return_url)
+        pay_with_default(order, payment_product_id, return_url, reuse_profile)
       end
     end
 
     private
 
-    def pay_with_default(*args)
+    def pay_with_default(order, payment_product_id, return_url, reuse_profile)
       global_collect.call(
         :insert_orderwithpayment,
-        order: credit_card_order_params(*args),
-        payment: credit_card_payment_params(*args)
+        order: credit_card_order_params(order, payment_product_id, return_url),
+        payment: credit_card_payment_params(order, payment_product_id, return_url, reuse_profile)
       )
     end
 
-    def pay_with_sepa(*args)
+    def pay_with_sepa(order, payment_product_id, return_url, reuse_profile)
       global_collect.call(
         :insert_orderwithpayment,
         order: credit_card_order_params(*args),
-        payment: credit_card_payment_params(*args)
+        payment: credit_card_payment_params(order, payment_product_id, return_url, reuse_profile)
                  .merge(sepa_payment_params)
       )
     end
@@ -201,8 +204,8 @@ module Spree
       }
     end
 
-    def credit_card_payment_params(order, payment_product_id, return_url)
-      {
+    def credit_card_payment_params(order, payment_product_id, return_url, reuse_profile)
+      hash_params = {
         amount: order.global_collect_total,
         currencycode: order.currency,
         countrycode: order.bill_address_country.try(:iso),
@@ -218,6 +221,14 @@ module Spree
         paymentproductid: payment_product_id,
         hostedindicator: 1
       }
+
+      if reuse_profile
+        hash_params[:profiletoken] = reusable_sources(order).last.try(:profile_token)
+      else
+        hash_params[:paymentproductid] = payment_product_id
+      end
+
+      hash_params
     end
 
     def payment_product_unrestricted?

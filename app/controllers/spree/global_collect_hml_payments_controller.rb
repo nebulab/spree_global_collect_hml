@@ -14,7 +14,8 @@ module Spree
         current_order,
         global_collect_params[:payment_product],
         global_collect_hml_payments_confirm_url(
-          global_collect: { payment_method_id: @payment_method.id })
+          global_collect: { payment_method_id: @payment_method.id }),
+        global_collect_params[:reuse_profile]
       )
 
       if @response.valid?

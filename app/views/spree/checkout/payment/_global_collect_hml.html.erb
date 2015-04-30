@@ -1,10 +1,17 @@
 <div data-hook="global-collect-payments">
+  <% if payment_method.reusable_sources(current_order).any? %>
+    <p>
+      <%= label :global_collect, :reuse_profile %>:
+      <%= check_box :global_collect, :reuse_profile, class: 'global-collect-reuse-profile' %>
+    </p>
+  <% end %>
+
   <p>
     <%= label :global_collect, :payment_product %>:
     <%= select :global_collect,
                :payment_product,
                payment_method.filtered_product_payments(current_order),
-               {include_blank: true},
+               { include_blank: true },
                class: 'global-collect-pay-select',
                data: {
                  link: "#global-collect-pay-link-#{payment_method.id}"

@@ -6,7 +6,7 @@ Spree::Admin::PaymentsHelper.module_eval do
       effortId: payment.source.effort_id,
       attemptId: payment.source.attempt_id,
       paymentProductId: payment.source.payment_product_id,
-      paymentMethodId: payment.source.payment_method_id,
+      paymentMethodId: payment.source.gc_payment_method_id,
       paymentReference: payment.source.payment_reference
     }
 
