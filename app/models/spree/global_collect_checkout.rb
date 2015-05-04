@@ -23,5 +23,12 @@ module Spree
     def payment_product
       payment.payment_method.payment_product_from_id(payment_product_id)
     end
+
+    def expiry_date=(date)
+      month, year = date.try(:scan, /.{1,2}/)
+
+      self[:expiry_date] = Date.strptime("#{year}-#{month}", '%y-%m')
+                           .end_of_month if month.present? && year.present?
+    end
   end
 end

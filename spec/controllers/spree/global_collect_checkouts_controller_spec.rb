@@ -34,5 +34,24 @@ describe Spree::GlobalCollectCheckoutsController do
         end
       end
     end
+
+    context 'when params are present' do
+      before do
+        expect_any_instance_of(Spree::GlobalCollectCheckout)
+          .to receive(:update_attributes).with(
+            cc_last_four_digits: '1234',
+            expiry_date:         '0122'
+          ).and_return(true)
+      end
+
+      it 'saves credit card details' do
+        post :update, use_route: :spree,
+                      'ORDERID' => global_collect_checkout.order_number,
+                      'CCLASTFOURDIGITS' => '1234',
+                      'EXPIRYDATE' => '0122'
+
+        expect(response.body).to eql 'OK\n'
+      end
+    end
   end
 end

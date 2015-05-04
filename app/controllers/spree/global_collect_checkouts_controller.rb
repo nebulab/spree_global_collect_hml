@@ -19,16 +19,8 @@ module Spree
     def global_collect_checkout_params
       {
         cc_last_four_digits: params.fetch('CCLASTFOURDIGITS'),
-        expiry_date:         parsed_date(params.fetch('EXPIRYDATE'))
+        expiry_date:         params.fetch('EXPIRYDATE')
       }
-    end
-
-    def parsed_date(date_param)
-      month, year = date_param.scan(/.{1,2}/)
-
-      Date.strptime("#{year}-#{month}", '%y-%m').end_of_month
-    rescue
-      nil
     end
   end
 end
