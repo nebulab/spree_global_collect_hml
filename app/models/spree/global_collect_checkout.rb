@@ -30,5 +30,9 @@ module Spree
       self[:expiry_date] = Date.strptime("#{year}-#{month}", '%y-%m')
                            .end_of_month if month.present? && year.present?
     end
+
+    def presentation
+      "Credit card with token: #{profile_token}"
+    end
   end
 end
