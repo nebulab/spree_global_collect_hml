@@ -163,7 +163,7 @@ module Spree
     def pay_with_sepa(order, payment_product_id, return_url, reuse_profile)
       global_collect.call(
         :insert_orderwithpayment,
-        order: credit_card_order_params(*args),
+        order: credit_card_order_params(order, payment_product_id, return_url),
         payment: credit_card_payment_params(order, payment_product_id, return_url, reuse_profile)
                  .merge(sepa_payment_params)
       )
