@@ -1,7 +1,7 @@
 ($ document).ready ->
   $select = ($ '.global-collect-pay-select')
   $link   = ($ '.global-collect-pay-link')
-  $reuse  = ($ '.global-collect-reuse-profile')
+  $reuse  = ($ '.global-collect-reuse-profile input:checked')
 
   if $select.is('*')
     $select.change ->
@@ -11,9 +11,10 @@
     $link.click (event) ->
       paymentProduct = ($ this).data('payment-product')
 
-      if $reuse.is(':checked')
+      if $reuse.is('*')
+        alert('reusing')
         oldHref = ($ this).attr('href')
-        reuseProfileParams = { global_collect: { reuse_profile: true } }
+        reuseProfileParams = { global_collect: { profile_id: $reuse.val() } }
 
         ($ this).attr('href', "#{oldHref}&#{$.param(reuseProfileParams)}")
       else if paymentProduct

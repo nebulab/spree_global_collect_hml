@@ -1,9 +1,8 @@
 <div data-hook="global-collect-payments">
   <% if payment_method.reusable_sources(current_order).any? %>
-    <p>
-      <%= label :global_collect, :reuse_profile %>:
-      <%= check_box :global_collect, :reuse_profile, class: 'global-collect-reuse-profile' %>
-    </p>
+    <div class="global-collect-reuse-profile">
+      <%= collection_radio_buttons(:global_collect, :profile_id, payment_method.reusable_sources(current_order), :id, :presentation) %>
+    </div>
   <% end %>
 
   <p>
