@@ -12,7 +12,7 @@ module Spree
       'Maestro'          => '117',
       'Sofort'           => '836',
       'SEPA'             => '770',
-      'Bank Transfer'    => '11',
+      'Bank Transfer'    => '11'
     }
 
     PAYMENT_PRODUCTS_RESTRICTIONS = {
@@ -29,7 +29,7 @@ module Spree
       PAYMENT_PRODUCTS['SEPA'] => {
         'currency' => %w(EUR),
         'countries' => %w(AT BE DE ES FR IT NL)
-      },
+      }
     }
 
     preference :merchant_id, :string
