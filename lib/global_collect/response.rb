@@ -32,7 +32,7 @@ module GlobalCollect
     end
 
     def error
-      response_field[:row][:errormessage]
+      response_field[:row].last[:errormessage].to_s
     rescue
       nil
     end
