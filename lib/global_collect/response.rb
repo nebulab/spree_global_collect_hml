@@ -1,5 +1,5 @@
-module Spree
-  class GlobalCollectResponse
+module GlobalCollect
+  class Response
     def initialize(raw_xml)
       parser = Nori.new(convert_tags_to: ->(tag) { tag.downcase.to_sym })
 

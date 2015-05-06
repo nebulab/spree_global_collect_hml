@@ -1,5 +1,5 @@
-module Spree
-  class GlobalCollectRequest
+module GlobalCollect
+  class Request
     def initialize(endpoint, merchant_id)
       @endpoint = endpoint
       @merchant_id = merchant_id
@@ -18,7 +18,7 @@ module Spree
         }, { key_converter: :upcase }
       )
 
-      GlobalCollectResponse.new(post_xml(@endpoint, xml))
+      GlobalCollect::Response.new(post_xml(@endpoint, xml))
     end
 
     private
