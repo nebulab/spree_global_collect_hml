@@ -60,18 +60,16 @@ module Spree
       )
 
       if response.success?
-        # Settare per usare AVS e CVV
-        source.payment.update_attributes(
-          response_code: response[:merchantreference]
-        )
-
         ActiveMerchant::Billing::Response.new(
           true, Spree.t('global_collect.payment_authorized'),
-          gc_response: response.to_s)
+          { gc_response: response.to_s },
+          authorization: response[:merchantreference]
+        )
       else
         ActiveMerchant::Billing::Response.new(
           false, response.error || Spree.t('global_collect.payment_error'),
-          gc_response: response.to_s)
+          gc_response: response.to_s
+        )
       end
     end
 
