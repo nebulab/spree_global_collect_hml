@@ -64,12 +64,16 @@ module Spree
         ActiveMerchant::Billing::Response.new(
           true, Spree.t('global_collect.payment_authorized'),
           { gc_response: response.to_s },
-          authorization: response[:merchantreference]
+          authorization: response[:merchantreference],
+          avs_result: { code: response[:avsresult] },
+          cvv_result: response[:cvvresult]
         )
       else
         ActiveMerchant::Billing::Response.new(
           false, response.error || Spree.t('global_collect.payment_error'),
-          gc_response: response.to_s
+          { gc_response: response.to_s },
+          avs_result: { code: response[:avsresult] },
+          cvv_result: response[:cvvresult]
         )
       end
     end
