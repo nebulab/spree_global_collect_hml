@@ -18,21 +18,20 @@ module GlobalCollect
     end
 
     def valid?
-      response_field.present? &&
-        response_field[:result] == 'OK' &&
-        response_field[:row][:errornumber].nil?
+      response_field.present? && response_field[:result] == 'OK'
     rescue
       false
     end
 
     def success?
-      valid? && response_field[:row][:statusid].to_i >= 600
+      valid? && response_field[response_type][:statusid].to_i >= 600
     rescue
       false
     end
 
     def error
-      response_field[:row].last[:errormessage].to_s
+      # To check with 2.0 docs
+      response_field[response_type].last[:errormessage].to_s
     rescue
       nil
     end
