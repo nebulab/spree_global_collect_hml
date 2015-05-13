@@ -11,7 +11,7 @@ module GlobalCollect
           xml: {
             request: {
               action: action.to_s.upcase,
-              meta: { merchantid: @merchant_id },
+              meta: { merchantid: @merchant_id, version: '2.0' },
               params: params
             }
           }
