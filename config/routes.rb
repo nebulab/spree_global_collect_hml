@@ -1,6 +1,6 @@
 Spree::Core::Engine.routes.draw do
   resource :global_collect_hml_payment, only: :create
-  resource :global_collect_checkout, only: :update
+  resource :global_collect_checkout, only: :create
 
   get 'global_collect_hml_payments/confirm',
       to: 'global_collect_hml_payments#confirm',

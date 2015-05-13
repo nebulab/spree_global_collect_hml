@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Spree::GlobalCollectCheckoutsController do
-  context 'update' do
+  context 'create' do
     let!(:global_collect_checkout) do
       FactoryGirl.create(:global_collect_checkout)
     end
@@ -9,7 +9,7 @@ describe Spree::GlobalCollectCheckoutsController do
     context 'when required params are missing' do
       context 'when ORDERID param is not provided' do
         it 'raises ActiveRecord::RecordNotFound' do
-          expect { post :update, use_route: :spree }
+          expect { post :create, use_route: :spree }
             .to raise_error(ActiveRecord::RecordNotFound)
         end
       end
@@ -17,7 +17,7 @@ describe Spree::GlobalCollectCheckoutsController do
       context 'when CCLASTFOURDIGITS is not provided' do
         it 'raises ActionController::ParameterMissing' do
           expect do
-            post :update, use_route: :spree,
+            post :create, use_route: :spree,
                           'ORDERID' => global_collect_checkout.order_number,
                           'EXPIRYDATE' => '0122'
           end.to raise_error(ActionController::ParameterMissing)
@@ -27,7 +27,7 @@ describe Spree::GlobalCollectCheckoutsController do
       context 'when EXPIRYDATE is not provided' do
         it 'raises ActionController::ParameterMissing' do
           expect do
-            post :update, use_route: :spree,
+            post :create, use_route: :spree,
                           'ORDERID' => global_collect_checkout.order_number,
                           'CCLASTFOURDIGITS' => '1234'
           end.to raise_error(ActionController::ParameterMissing)
@@ -45,7 +45,7 @@ describe Spree::GlobalCollectCheckoutsController do
       end
 
       it 'saves credit card details' do
-        post :update, use_route: :spree,
+        post :create, use_route: :spree,
                       'ORDERID' => global_collect_checkout.order_number,
                       'CCLASTFOURDIGITS' => '1234',
                       'EXPIRYDATE' => '0122'

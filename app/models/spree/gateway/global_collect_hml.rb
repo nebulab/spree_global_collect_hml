@@ -51,6 +51,7 @@ module Spree
 
     def authorize(amount, source, gateway_options={})
       response = provider.get_orderstatus(source.order_number)
+
       source.update_attributes(
         payment_product_id:   response[:paymentproductid],
         effort_id:            response[:effortid],

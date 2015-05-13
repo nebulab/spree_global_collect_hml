@@ -2,7 +2,7 @@ module Spree
   class GlobalCollectCheckoutsController < ApplicationController
     before_filter :load_global_collect_checkout
 
-    def update
+    def create
       if @global_collect_checkout.update_attributes(global_collect_checkout_params)
         render plain: 'OK\n'
       else
