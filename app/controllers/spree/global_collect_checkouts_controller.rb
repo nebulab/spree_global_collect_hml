@@ -1,13 +1,15 @@
 module Spree
   class GlobalCollectCheckoutsController < ApplicationController
-    before_filter :load_global_collect_checkout
+    before_filter :load_global_collect_checkout, :load_payment
 
     def create
-      if @global_collect_checkout.update_attributes(global_collect_checkout_params)
+      if @global_collect_checkout.can_capture?(@payment) && @payment.capture!
         render plain: 'OK\n'
       else
         render plain: 'NOK\n'
       end
+    rescue Spree::Core::GatewayError
+      render plain: 'NOK\n'
     end
 
     private
@@ -16,11 +18,8 @@ module Spree
       @global_collect_checkout = GlobalCollectCheckout.find_by_order_number!(params['ORDERID'])
     end
 
-    def global_collect_checkout_params
-      {
-        cc_last_four_digits: params.fetch('CCLASTFOURDIGITS'),
-        expiry_date:         params.fetch('EXPIRYDATE')
-      }
+    def load_payment
+      @payment = @global_collect_checkout.payment
     end
   end
 end

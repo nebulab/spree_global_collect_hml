@@ -4,10 +4,6 @@ module Spree
 
     scope :with_payment_profile, -> { where('profile_token IS NOT NULL') }
 
-    def actions
-      %w(capture)
-    end
-
     def can_capture?(payment)
       payment.pending? || payment.checkout?
     end
