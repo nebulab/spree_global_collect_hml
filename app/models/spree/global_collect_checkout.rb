@@ -31,8 +31,24 @@ module Spree
                            .end_of_month if month.present? && year.present?
     end
 
+    def cc_last_four_digits=(credit_card)
+      self[:cc_last_four_digits] = credit_card.try(:[], -4, 4)
+    end
+
     def presentation
       "Credit card with token: #{profile_token}"
+    end
+
+    def save_checkout_details(response)
+      update_attributes(
+        payment_product_id:   response[:paymentproductid],
+        effort_id:            response[:effortid],
+        attempt_id:           response[:attemptid],
+        gc_payment_method_id: response[:paymentmethodid],
+        payment_reference:    response[:paymentreference],
+        cc_last_four_digits:  response[:creditcardnumber],
+        expiry_date:          response[:expirydate]
+      )
     end
   end
 end
