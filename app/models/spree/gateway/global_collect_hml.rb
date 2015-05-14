@@ -51,7 +51,6 @@ module Spree
 
     def authorize(amount, source, gateway_options={})
       response = provider.get_orderstatus(source.order_number)
-
       source.save_checkout_details(response)
 
       if response.success?
@@ -59,15 +58,15 @@ module Spree
           true, Spree.t('global_collect.payment_authorized'),
           { gc_response: response.to_s },
           authorization: response[:merchantreference],
-          avs_result: { code: response[:avsresult] },
-          cvv_result: response[:cvvresult]
+          avs_result: response.avs_result,
+          cvv_result: response.cvv_result
         )
       else
         ActiveMerchant::Billing::Response.new(
           false, response.error || Spree.t('global_collect.payment_error'),
           { gc_response: response.to_s },
-          avs_result: { code: response[:avsresult] },
-          cvv_result: response[:cvvresult]
+          avs_result: response.avs_result,
+          cvv_result: response.cvv_result
         )
       end
     end

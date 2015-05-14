@@ -40,6 +40,18 @@ module GlobalCollect
       @raw_xml.to_s
     end
 
+    def avs_result
+      result = response_field[response_type][:avsresult]
+
+      { code: result == '0' ? nil : result }
+    end
+
+    def cvv_result
+      result = response_field[response_type][:cvvresult]
+
+      result == '0' ? nil : result
+    end
+
     private
 
     def response_field
