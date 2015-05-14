@@ -36,7 +36,7 @@ module Spree
     end
 
     def presentation
-      "Credit card with token: #{profile_token}"
+      Spree.t(:credit_card_profile, expiry_date: expiry_date.try(:strftime, '%m-%Y'), last_digits: cc_last_four_digits)
     end
 
     def save_checkout_details(response)
