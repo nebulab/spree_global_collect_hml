@@ -24,7 +24,7 @@ module GlobalCollect
     end
 
     def success?
-      valid? && response_field[response_type][:statusid].to_i >= 600
+      valid? && response_field[response_type][:statusid].to_i >= 525
     rescue
       false
     end
