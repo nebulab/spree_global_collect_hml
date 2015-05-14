@@ -39,6 +39,13 @@ module Spree
       Spree.t(:credit_card_profile, expiry_date: expiry_date.try(:strftime, '%m-%Y'), last_digits: cc_last_four_digits)
     end
 
+    def credit_card_type
+      payment_product_value = payment_product_id.to_s
+
+      return 'Unkown type' unless GlobalCollect::Constants::PAYMENT_PRODUCTS.has_value?(payment_product_value)
+      GlobalCollect::Constants::PAYMENT_PRODUCTS.key(payment_product_value)
+    end
+
     def save_checkout_details(response)
       update_attributes(
         payment_product_id:   response[:paymentproductid],
