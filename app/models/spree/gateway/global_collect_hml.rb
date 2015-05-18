@@ -42,7 +42,7 @@ module Spree
       else
         if order.user_id
           global_collect_checkouts
-            .where(user_id: order.user_id).with_payment_profile
+            .where(user_id: order.user_id).with_payment_profile.valid
         else
           []
         end
