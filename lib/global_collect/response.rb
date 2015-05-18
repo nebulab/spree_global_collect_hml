@@ -30,8 +30,12 @@ module GlobalCollect
     end
 
     def error
-      # To check with 2.0 docs
-      response_field[response_type].last[:errormessage].to_s
+      errors = response_field[response_type][:errors]
+
+      case errors
+      when Hash  then GlobalCollect::Constants::ERRORS[errors[:error][:code]]
+      when Array then GlobalCollect::Constants::ERRORS[errors.first[:error][:code]]
+      end
     rescue
       nil
     end
