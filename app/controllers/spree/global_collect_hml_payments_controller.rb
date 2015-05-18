@@ -38,8 +38,11 @@ module Spree
         ),
         amount: @order.total, payment_method: payment_method
       )
-
       @order.next
+
+      if @order.errors[:base].any?
+        flash[:error] = @order.errors.full_messages_for(:base).join(', ')
+      end
 
       render layout: false
     end
@@ -53,7 +56,6 @@ module Spree
         flash['order_completed'] = true
         redirect_to order_path(order, token: order.guest_token)
       else
-        flash[:error] = Spree.t('global_collect.payment_error')
         redirect_to checkout_state_path(order.state)
       end
     end

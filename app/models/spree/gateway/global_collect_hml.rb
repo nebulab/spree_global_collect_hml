@@ -63,7 +63,7 @@ module Spree
         )
       else
         ActiveMerchant::Billing::Response.new(
-          false, response.error || Spree.t('global_collect.payment_error'),
+          false, response.error,
           { gc_response: response.to_s },
           avs_result: response.avs_result,
           cvv_result: response.cvv_result
