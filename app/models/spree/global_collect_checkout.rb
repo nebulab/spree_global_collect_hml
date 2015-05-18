@@ -3,6 +3,7 @@ module Spree
     has_one :payment, class_name: 'Spree::Payment', as: :source
 
     scope :with_payment_profile, -> { where('profile_token IS NOT NULL') }
+    scope :valid,                -> { where('expiry_date > ?', Time.now.beginning_of_day) }
 
     def can_capture?(payment)
       payment.pending? || payment.checkout?

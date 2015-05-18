@@ -48,4 +48,16 @@ describe Spree::GlobalCollectCheckout do
         .to eql '1222'
     end
   end
+
+  context '.valid' do
+    let!(:global_collect_checkout)         { FactoryGirl.create(:global_collect_checkout, expiry_date: "12#{3.years.from_now.year.to_s[-2..-1]}") }
+    let!(:expired_global_collect_checkout) { FactoryGirl.create(:global_collect_checkout, expiry_date: "12#{3.years.ago.year.to_s[-2..-1]}") }
+
+    subject { described_class.valid }
+
+    it 'returns only profiles not expired' do
+      expect(subject).to include global_collect_checkout
+      expect(subject).not_to include expired_global_collect_checkout
+    end
+  end
 end
