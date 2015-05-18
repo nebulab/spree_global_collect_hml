@@ -1,6 +1,8 @@
 en:
   spree:
     global_collect:
+      debug_request: "GlobalCollect REQUEST (%{method} to %{url}):\n  %{body}"
+      debug_response: "GlobalCollect RESPONSE:\n  %{body}"
       link: "View on Global Collect"
       submit_order: "Submit order"
       payment_authorized: "The payment has been succesfully authorized"

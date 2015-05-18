@@ -33,7 +33,18 @@ module GlobalCollect
       end
 
       response = http.post(url.path, xml_string, 'Content-Type' => 'text/xml')
+      log('POST', url_string, xml_string, response.body)
+
       response.body
+    end
+
+    def log(method, url, request, response)
+      request_log = Spree.t('global_collect.debug_request',
+                            method: method, url: url, body: request)
+      response_log = Spree.t('global_collect.debug_response', body: response)
+
+      Rails.logger.debug(request_log)
+      Rails.logger.info(response_log)
     end
   end
 end
