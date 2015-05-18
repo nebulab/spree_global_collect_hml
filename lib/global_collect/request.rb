@@ -43,7 +43,7 @@ module GlobalCollect
                             method: method, url: url, body: request)
       response_log = Spree.t('global_collect.debug_response', body: response)
 
-      Rails.logger.debug(request_log)
+      Rails.logger.info(request_log)
       Rails.logger.info(response_log)
     end
   end
