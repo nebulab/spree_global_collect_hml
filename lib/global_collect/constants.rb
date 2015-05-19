@@ -1,7 +1,10 @@
 module GlobalCollect
   module Constants
-    TEST_URL = 'https://ps.gcsip.nl/wdl/wdl'
-    LIVE_URL = 'https://ps.gcsip.com/wdl/wdl'
+    PAYMENTS_TEST_URL = 'https://ps.gcsip.nl/wdl/wdl'
+    PAYMENTS_LIVE_URL = 'https://ps.gcsip.com/wdl/wdl'
+
+    CONSOLE_TEST_URL = 'https://wpc.gcsip.nl/wpc'
+    CONSOLE_LIVE_URL = 'https://wpc.gcsip.com/wpc'
 
     PAYMENT_PRODUCTS = {
       'Visa'             => '1',

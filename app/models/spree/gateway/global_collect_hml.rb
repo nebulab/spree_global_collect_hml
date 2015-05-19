@@ -204,7 +204,7 @@ module Spree
     end
 
     def endpoint_url
-      preferred_test_mode ? TEST_URL : LIVE_URL
+      preferred_test_mode ? PAYMENTS_TEST_URL : PAYMENTS_LIVE_URL
     end
 
     def global_collect
