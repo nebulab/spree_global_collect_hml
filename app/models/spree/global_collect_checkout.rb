@@ -5,6 +5,10 @@ module Spree
     scope :with_payment_profile, -> { where('profile_token IS NOT NULL') }
     scope :valid,                -> { where('expiry_date > ?', Time.now.beginning_of_day) }
 
+    def actions
+      %w(capture)
+    end
+
     def can_capture?(payment)
       payment.pending? || payment.checkout?
     end
