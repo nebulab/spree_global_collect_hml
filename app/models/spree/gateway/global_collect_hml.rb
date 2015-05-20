@@ -75,6 +75,8 @@ module Spree
       ActiveMerchant::Billing::Response.new(true, Spree.t('global_collect.payment_confirmed'))
     end
 
+    def cancel(response_code); end
+
     def create_profile(payment)
       return if payment.source.has_payment_profile?
 
