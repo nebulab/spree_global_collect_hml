@@ -4,6 +4,7 @@ module Spree
 
     preference :merchant_id, :string
     preference :test_mode, :boolean, default: false
+    preference :avs_enabled, :boolean, default: false
     preference :payment_products, :hash, default: PAYMENT_PRODUCTS
     preference :payment_product_restrictions, :hash,
                default: PAYMENT_PRODUCTS_RESTRICTIONS
@@ -58,14 +59,14 @@ module Spree
           true, Spree.t('global_collect.payment_authorized'),
           { gc_response: response.to_s },
           authorization: response[:merchantreference],
-          avs_result: response.avs_result,
+          avs_result: preferred_avs_enabled ? response.avs_result : nil,
           cvv_result: response.cvv_result
         )
       else
         ActiveMerchant::Billing::Response.new(
           false, response.error,
           { gc_response: response.to_s },
-          avs_result: response.avs_result,
+          avs_result: preferred_avs_enabled ? response.avs_result : nil,
           cvv_result: response.cvv_result
         )
       end
