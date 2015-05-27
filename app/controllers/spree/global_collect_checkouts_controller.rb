@@ -1,6 +1,7 @@
 module Spree
   class GlobalCollectCheckoutsController < ApplicationController
     before_filter :load_global_collect_checkout, :load_payment
+    skip_before_action :verify_authenticity_token, only: :create
 
     def create
       if @global_collect_checkout.can_capture?(@payment) && @payment.capture!
