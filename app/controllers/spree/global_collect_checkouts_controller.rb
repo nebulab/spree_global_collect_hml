@@ -5,12 +5,12 @@ module Spree
 
     def create
       if @global_collect_checkout.can_capture?(@payment) && @payment.capture!
-        render plain: 'OK\n'
+        render plain: "OK\n"
       else
-        render plain: 'NOK\n'
+        render plain: "NOK\n"
       end
     rescue Spree::Core::GatewayError
-      render plain: 'NOK\n'
+      render plain: "NOK\n"
     end
 
     private
