@@ -12,7 +12,7 @@ Spree::Order.class_eval do
   end
 
   def global_collect_total
-    (total * 100).to_i
+    Spree::Money.new(total_without_decimals).cents
   end
 
   def address_iso(address_type)
@@ -25,5 +25,11 @@ Spree::Order.class_eval do
   # Original method: https://github.com/spree/spree/blob/a1172606f27ee2e71f097bf301df9f99881ad2f5/core/app/models/spree/order.rb#L176
   def confirmation_required?
     Spree::Config[:always_include_confirm_step] || state == 'confirm'
+  end
+
+  private
+
+  def total_without_decimals
+    Spree::Config[:hide_cents] ? total.floor : total
   end
 end
