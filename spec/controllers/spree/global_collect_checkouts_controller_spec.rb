@@ -8,9 +8,10 @@ describe Spree::GlobalCollectCheckoutsController do
 
     context 'when required params are missing' do
       context 'when ORDERID param is not provided' do
-        it 'raises ActiveRecord::RecordNotFound' do
-          expect { post :create, use_route: :spree }
-            .to raise_error(ActiveRecord::RecordNotFound)
+        it 'rescues ActiveRecord::RecordNotFound with NOK' do
+          post :create, use_route: :spree
+
+          expect(response.body).to eql "NOK\n"
         end
       end
     end
@@ -25,7 +26,7 @@ describe Spree::GlobalCollectCheckoutsController do
         post :create, use_route: :spree,
                       'ORDERID' => global_collect_checkout.order_number
 
-        expect(response.body).to eql 'OK\n'
+        expect(response.body).to eql "OK\n"
       end
     end
   end

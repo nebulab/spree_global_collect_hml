@@ -3,14 +3,15 @@ module Spree
     before_filter :load_global_collect_checkout, :load_payment
     skip_before_action :verify_authenticity_token, only: :create
 
+    rescue_from ActiveRecord::RecordNotFound, Spree::Core::GatewayError,
+                with: :render_nok
+
     def create
       if @global_collect_checkout.can_capture?(@payment) && @payment.capture!
         render plain: "OK\n"
       else
-        render plain: "NOK\n"
+        render_nok
       end
-    rescue Spree::Core::GatewayError
-      render plain: "NOK\n"
     end
 
     private
@@ -21,6 +22,10 @@ module Spree
 
     def load_payment
       @payment = @global_collect_checkout.payment
+    end
+
+    def render_nok
+      render plain: "NOK\n"
     end
   end
 end
