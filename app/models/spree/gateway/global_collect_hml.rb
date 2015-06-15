@@ -73,7 +73,25 @@ module Spree
     end
 
     def capture(amount, source, gateway_options={})
-      ActiveMerchant::Billing::Response.new(true, Spree.t('global_collect.payment_confirmed'))
+      payment = Spree::Payment.find_by_response_code(source)
+
+      response = provider.set_payment(
+        payment.order.global_collect_number,
+        payment.source.payment_product_id,
+        payment.global_collect_amount
+      )
+
+      if response.valid?
+        ActiveMerchant::Billing::Response.new(
+          true, Spree.t('global_collect.payment_captured'),
+          gc_response: response.to_s
+        )
+      else
+        ActiveMerchant::Billing::Response.new(
+          false, response.error,
+          gc_response: response.to_s
+        )
+      end
     end
 
     def cancel(response_code); end
@@ -106,6 +124,13 @@ module Spree
 
     def get_orderstatus(order_number)
       global_collect.call(:get_orderstatus, order: { orderid: order_number })
+    end
+
+    def set_payment(order_number, payment_product_id, amount)
+      global_collect.call(:set_payment, payment: {
+        orderid: order_number, amount: amount,
+        paymentproductid: payment_product_id
+      })
     end
 
     def convert_paymenttoprofile(order_number)
