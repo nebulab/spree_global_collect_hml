@@ -78,7 +78,7 @@ module Spree
       response = provider.set_payment(
         payment.order.global_collect_number,
         payment.source.payment_product_id,
-        payment.order.global_collect_total
+        payment.global_collect_amount
       )
 
       if response.valid?
