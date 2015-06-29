@@ -35,7 +35,7 @@ describe Spree::GlobalCollectCheckoutsController do
                       'ORDERID'  => global_collect_checkout.order_number,
                       'STATUSID' => 500
 
-        expect(response.body).to eql "OK\n"
+        expect(response.body).to eql "NOK\n"
       end
     end
   end
