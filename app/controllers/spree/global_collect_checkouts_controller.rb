@@ -7,7 +7,7 @@ module Spree
                 with: :render_nok
 
     def create
-      return render_nok unless params['STATUSID'].present? && params['STATUSID'].to_i >= 800
+      return render(nothing: true) unless params['STATUSID'].present? && params['STATUSID'].to_i >= 800
 
       if @payment.complete!
         render_ok
