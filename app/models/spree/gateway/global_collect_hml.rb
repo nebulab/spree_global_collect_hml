@@ -13,10 +13,6 @@ module Spree
              class_name: 'Spree::GlobalCollectCheckout',
              foreign_key: 'payment_method_id'
 
-    def method_type
-      'global_collect_hml'
-    end
-
     def provider_class
       provider.class
     end
