@@ -1,6 +1,6 @@
 module Spree
   class GlobalCollectCheckoutsController < ApplicationController
-    before_filter :load_global_collect_checkout, :load_payment
+    before_filter :log_request, :load_global_collect_checkout, :load_payment
     skip_before_action :verify_authenticity_token, only: :create
 
     rescue_from ActiveRecord::RecordNotFound, Spree::Core::GatewayError,
@@ -15,6 +15,12 @@ module Spree
     end
 
     private
+
+    def log_request
+      request_log = Spree.t('global_collect.debug_webhook', params: params)
+
+      Rails.logger.info(request_log)
+    end
 
     def load_global_collect_checkout
       @global_collect_checkout = GlobalCollectCheckout.find_by_order_number!(params['ORDERID'])
