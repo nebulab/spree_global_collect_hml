@@ -7,8 +7,10 @@ module Spree
                 with: :render_nok
 
     def create
-      if @global_collect_checkout.can_capture?(@payment) && @payment.capture!
-        render plain: "OK\n"
+      return render_ok unless params['STATUSID'].present? && params['STATUSID'].to_i >= 800
+
+      if @payment.complete!
+        render_ok
       else
         render_nok
       end
@@ -28,6 +30,10 @@ module Spree
 
     def load_payment
       @payment = @global_collect_checkout.payment
+    end
+
+    def render_ok
+      render plain: "OK\n"
     end
 
     def render_nok

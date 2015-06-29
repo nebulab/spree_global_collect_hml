@@ -17,14 +17,23 @@ describe Spree::GlobalCollectCheckoutsController do
     end
 
     context 'when params are present' do
-      before do
+      it 'completes an order and returns OK' do
         expect_any_instance_of(Spree::Payment)
-          .to receive(:capture!).and_return(true)
+          .to receive(:complete!).and_return(true)
+
+        post :create, use_route: :spree,
+                      'ORDERID'  => global_collect_checkout.order_number,
+                      'STATUSID' => 800
+
+        expect(response.body).to eql "OK\n"
       end
 
-      it 'saves credit card details' do
+      it 'returns OK when STATUSID is under 800' do
+        expect_any_instance_of(Spree::Payment).not_to receive(:complete!)
+
         post :create, use_route: :spree,
-                      'ORDERID' => global_collect_checkout.order_number
+                      'ORDERID'  => global_collect_checkout.order_number,
+                      'STATUSID' => 500
 
         expect(response.body).to eql "OK\n"
       end
