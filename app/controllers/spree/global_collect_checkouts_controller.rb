@@ -1,5 +1,5 @@
 module Spree
-  class GlobalCollectCheckoutsController < ApplicationController
+  class GlobalCollectCheckoutsController < BaseController
     before_filter :log_request, :load_global_collect_checkout, :load_payment
     skip_before_action :verify_authenticity_token, only: :create
 
