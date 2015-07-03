@@ -42,7 +42,10 @@ module Spree
     end
 
     def status_successful?
-      params['STATUSID'].present? && params['STATUSID'].to_i >= 800
+      return false unless params['STATUSID'].present?
+
+      # Successful if STATUSID is READY (800) or PAID (1000)
+      params['STATUSID'].to_i == 800 || params['STATUSID'].to_i == 1000
     end
   end
 end
