@@ -215,11 +215,11 @@ module Spree
         returnurl: return_url,
         customeripaddress: order.last_ip_address,
         paymentproductid: payment_product_id,
-        hostedindicator: 1,
+        hostedindicator: 1
       }
 
       if profile_id && profile = Spree::GlobalCollectCheckout.find(profile_id)
-        hash_params[:paymentmethodid] = profile.payment_product_id
+        hash_params[:paymentproductid] = profile.payment_product_id
         hash_params[:profiletoken]    = profile.profile_token
       end
 
