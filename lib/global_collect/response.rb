@@ -51,7 +51,7 @@ module GlobalCollect
     end
 
     def cvv_result
-      result = response_field[response_type][:cvvresult]
+      result = response_field[response_type][:cvvresult] rescue nil
 
       result == '0' ? nil : result
     end
