@@ -31,14 +31,7 @@ module Spree
     def confirm
       @order = current_order
 
-      @order.payments.create!(
-        source: GlobalCollectCheckout.create(
-          order_number:      @order.global_collect_number,
-          user_id:           @order.user_id,
-          payment_method_id: payment_method.try(:id)
-        ),
-        amount: @order.total, payment_method: payment_method
-      )
+      @order.create_global_collect_payment!(payment_method)
       @order.next
 
       if @order.errors[:base].any?

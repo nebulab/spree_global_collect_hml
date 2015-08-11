@@ -7,6 +7,10 @@ Spree::Order.class_eval do
            :global_collect_city, :zipcode, :state_text, :global_collect_street,
            to: :ship_address, allow_nil: true, prefix: true
 
+  scope :number_ends_with do |number|
+    where("#{table_name}.number LIKE ?", "%#{number}")
+  end
+
   def global_collect_number
     number.gsub(/[^0-9]/i, '')
   end
@@ -25,6 +29,17 @@ Spree::Order.class_eval do
   # Original method: https://github.com/spree/spree/blob/a1172606f27ee2e71f097bf301df9f99881ad2f5/core/app/models/spree/order.rb#L176
   def confirmation_required?
     Spree::Config[:always_include_confirm_step] || state == 'confirm'
+  end
+
+  def create_global_collect_payment!(payment_method)
+    payments.create!(
+      source: GlobalCollectCheckout.create(
+        order_number:      global_collect_number,
+        user_id:           user_id,
+        payment_method_id: payment_method.try(:id)
+      ),
+      amount: total, payment_method: payment_method
+    )
   end
 
   private

@@ -8,7 +8,7 @@ module Spree
 
     def create
       return render(nothing: true) unless status_successful?
-      return render_ok             if @payment.completed?
+      return render_ok             if @payment.try(:completed?)
 
       if @payment.complete!
         render_ok
@@ -26,11 +26,21 @@ module Spree
     end
 
     def load_global_collect_checkout
-      @global_collect_checkout = GlobalCollectCheckout.find_by_order_number!(params['ORDERID'])
+      @global_collect_checkout =
+        GlobalCollectCheckout.find_by_order_number(params['ORDERID']) ||
+        create_global_collect_checkout
+    end
+
+    def create_global_collect_checkout
+      payment_method = Spree::PaymentMethod.find_by_type!(Spree::Gateway::GlobalCollectHml)
+      order          = Spree::Order.number_ends_with(params['ORDERID'])
+      payment        = order.create_global_collect_payment!(payment_method)
+
+      payment.source
     end
 
     def load_payment
-      @payment = @global_collect_checkout.payment
+      @payment = @global_collect_checkout.try(:payment)
     end
 
     def render_ok
