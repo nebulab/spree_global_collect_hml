@@ -1,6 +1,6 @@
 module Spree
   class GlobalCollectHmlPaymentsController < StoreController
-    before_filter :validate_current_order!, except: :complete
+    before_filter :validate_current_order!, except: [:complete, :confirm]
     before_filter :validate_ref_and_returnmac!, only: :confirm
     skip_before_action :verify_authenticity_token, only: :create
 
