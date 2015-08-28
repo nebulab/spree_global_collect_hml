@@ -15,7 +15,7 @@ module Spree
         current_order,
         global_collect_params[:payment_product],
         global_collect_hml_payments_confirm_url(
-          global_collect: { payment_method_id: @payment_method.id }),
+          global_collect: { spree_order_id: current_order.id, payment_method_id: @payment_method.id }),
         global_collect_params[:profile_id]
       )
 
@@ -29,7 +29,7 @@ module Spree
     end
 
     def confirm
-      @order = current_order
+      @order = Order.find(global_collect_params[:spree_order_id])
 
       @order.payments.create!(
         source: GlobalCollectCheckout.create(
