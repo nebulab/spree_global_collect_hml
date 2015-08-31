@@ -3,7 +3,6 @@ module Spree
     module Error
       class NotFound < StandardError; end
     end
-    before_filter :validate_current_order!, except: [:complete, :confirm]
     before_filter :validate_ref_and_returnmac!, only: :confirm
     skip_before_action :verify_authenticity_token, only: :create
 
@@ -76,10 +75,6 @@ module Spree
         'ref' => response[:ref],
         'returnmac' => response[:returnmac]
       }
-    end
-
-    def validate_current_order!
-      current_order || fail(Error::NotFound, 'current_order not found')
     end
 
     def validate_ref_and_returnmac!
