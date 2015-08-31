@@ -25,6 +25,7 @@ module Spree
         store_global_collect_session_data(@response)
         redirect_to(@response[:formaction]) unless request.xhr?
       else
+        session['global_collect'] = {}
         flash[:error] = Spree.t('global_collect.connection_error')
         redirect_to checkout_state_path(current_order.state) unless request.xhr?
       end
