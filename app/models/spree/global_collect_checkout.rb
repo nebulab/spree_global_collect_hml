@@ -10,7 +10,7 @@ module Spree
     end
 
     def can_capture?(payment)
-      payment.pending? || payment.checkout?
+      (payment.pending? || payment.checkout?) && payment_product != "Sofort"
     end
 
     def has_payment_profile?
