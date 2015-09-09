@@ -1,5 +1,7 @@
 module GlobalCollect
   class Response
+    attr_reader :parsed_xml
+
     def initialize(raw_xml)
       parser = Nori.new(convert_tags_to: ->(tag) { tag.downcase.to_sym })
 
