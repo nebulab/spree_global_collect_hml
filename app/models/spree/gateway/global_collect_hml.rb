@@ -94,7 +94,12 @@ module Spree
       end
     end
 
-    def cancel(response_code); end
+    def cancel(response_code)
+      ActiveMerchant::Billing::Response.new(
+        true,
+        Spree.t('global_collect.payment_canceled')
+      )
+    end
 
     def create_profile(payment)
       return if payment.source.has_payment_profile?

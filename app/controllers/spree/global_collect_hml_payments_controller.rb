@@ -1,6 +1,8 @@
 module Spree
   class GlobalCollectHmlPaymentsController < StoreController
-    before_filter :validate_current_order!, except: :complete
+    module Error
+      class NotFound < StandardError; end
+    end
     before_filter :validate_ref_and_returnmac!, only: :confirm
     skip_before_action :verify_authenticity_token, only: :create
 
@@ -15,7 +17,7 @@ module Spree
         current_order,
         global_collect_params[:payment_product],
         global_collect_hml_payments_confirm_url(
-          global_collect: { payment_method_id: @payment_method.id }),
+          global_collect: { spree_order_id: current_order.id, payment_method_id: @payment_method.id }),
         global_collect_params[:profile_id]
       )
 
@@ -23,13 +25,14 @@ module Spree
         store_global_collect_session_data(@response)
         redirect_to(@response[:formaction]) unless request.xhr?
       else
+        session['global_collect'] = {}
         flash[:error] = Spree.t('global_collect.connection_error')
         redirect_to checkout_state_path(current_order.state) unless request.xhr?
       end
     end
 
     def confirm
-      @order = current_order
+      @order = Order.find(global_collect_params[:spree_order_id])
 
       @order.create_global_collect_payment!(payment_method)
       @order.next
@@ -68,14 +71,10 @@ module Spree
       }
     end
 
-    def validate_current_order!
-      current_order || fail(ActiveRecord::RecordNotFound)
-    end
-
     def validate_ref_and_returnmac!
       (session['global_collect']['ref'] == params['REF'] &&
         session['global_collect']['returnmac'] == params['RETURNMAC']) ||
-        fail(ActiveRecord::RecordNotFound)
+        fail(Error::NotFound, 'Required Global Collect parameters not found')
     end
 
     def payment_method

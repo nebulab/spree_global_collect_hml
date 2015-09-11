@@ -8,6 +8,7 @@ en:
       submit_order: "Submit order"
       payment_authorized: "The payment has been succesfully authorized"
       payment_captured: "The payment has been succesfully captured"
+      payment_canceled: "The payment has been canceled"
       generic_payment_error: "There has been an error processing your payment"
       payment_error: "There has been an error processing your payment: %{text}"
       connection_error: "There has been an error connecting to the gateway provider"
