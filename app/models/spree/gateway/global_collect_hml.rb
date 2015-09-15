@@ -51,14 +51,19 @@ module Spree
     end
 
     def authorize(amount, source, gateway_options={})
-      response = provider.get_orderstatus(source.order_number)
-      source.save_checkout_details(response)
+      response    = provider.get_orderstatus(source.order_number)
+      merchantref = response[:merchantreference]
 
+      return ActiveMerchant::Billing::Response.new(
+        false, "A source with merchant ref #{merchantref} already exists."
+      ) if GlobalCollectCheckout.exists?(merchant_reference: merchantref)
+
+      source.save_checkout_details(response)
       if response.success?
         ActiveMerchant::Billing::Response.new(
           true, Spree.t('global_collect.payment_authorized'),
           { gc_response: response.to_s },
-          authorization: response[:merchantreference],
+          authorization: merchantref,
           avs_result: preferred_avs_enabled ? response.avs_result : nil,
           cvv_result: response.cvv_result
         )

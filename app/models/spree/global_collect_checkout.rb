@@ -54,6 +54,7 @@ module Spree
         attempt_id:           response[:attemptid],
         gc_payment_method_id: response[:paymentmethodid],
         payment_reference:    response[:paymentreference],
+        merchant_reference:   response[:merchantreference],
         cc_last_four_digits:  response[:creditcardnumber],
         expiry_date:          response[:expirydate]
       )

@@ -34,15 +34,18 @@ module Spree
     def confirm
       @order = Order.find(global_collect_params[:spree_order_id])
 
-      @order.payments.create!(
-        source: GlobalCollectCheckout.create(
-          order_number:      @order.global_collect_number,
-          user_id:           @order.user_id,
-          payment_method_id: payment_method.try(:id)
-        ),
-        amount: @order.total, payment_method: payment_method
-      )
-      @order.next
+      Spree::Order.transaction do
+        @order.payments.create!(
+          source: GlobalCollectCheckout.create(
+            order_number:      @order.global_collect_number,
+            user_id:           @order.user_id,
+            payment_method_id: payment_method.try(:id)
+          ),
+          amount: @order.total, payment_method: payment_method
+        )
+
+        @order.next || fail(ActiveRecord::Rollback)
+      end
 
       if @order.errors[:base].any?
         flash[:error] = @order.errors.full_messages_for(:base).join(', ')
