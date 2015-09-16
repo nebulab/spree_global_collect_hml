@@ -28,7 +28,7 @@ module GlobalCollect
       http = Net::HTTP.new(url.host, url.port)
       if url.scheme == 'https'
         http.use_ssl = true
-        http.ssl_version = 'TLSv1'
+        http.ssl_version = 'TLSv1_2'
         # http.verify_mode = OpenSSL::SSL::VERIFY_PEER
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         # http.ciphers = 'RC4-MD5'
