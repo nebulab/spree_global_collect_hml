@@ -28,8 +28,10 @@ module GlobalCollect
       http = Net::HTTP.new(url.host, url.port)
       if url.scheme == 'https'
         http.use_ssl = true
+        http.ssl_version = 'TLSv1'
         http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-        http.ciphers = 'RC4-MD5'
+        # http.ciphers = 'RC4-MD5'
+        http.ciphers = ['AES256-SHA']
       end
 
       response = http.post(url.path, xml_string, 'Content-Type' => 'text/xml')
