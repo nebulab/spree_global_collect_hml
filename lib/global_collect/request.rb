@@ -29,7 +29,8 @@ module GlobalCollect
       if url.scheme == 'https'
         http.use_ssl = true
         http.ssl_version = 'TLSv1'
-        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        # http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         # http.ciphers = 'RC4-MD5'
         http.ciphers = ['AES256-SHA']
       end
