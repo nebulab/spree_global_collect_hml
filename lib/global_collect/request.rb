@@ -23,6 +23,17 @@ module GlobalCollect
 
     private
 
+
+    # Quick test:
+    # require 'openssl'
+    # require 'net/https'
+    #
+    # url = URI.parse('https://ps.gcsip.nl/wdl/wdl')
+    # http = Net::HTTP.new(url.host, url.port)
+    # http.use_ssl = true
+    # http.ssl_version = :TLSv1
+    # http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+    # http.post('/', '<test></test>', 'Content-Type' => 'text/xml')
     def post_xml(url_string, xml_string)
       url = URI.parse(url_string)
       http = Net::HTTP.new(url.host, url.port)
@@ -31,7 +42,7 @@ module GlobalCollect
         http.ssl_version = :TLSv1
         http.verify_mode = OpenSSL::SSL::VERIFY_PEER
         # http.ciphers = OpenSSL::SSL::SSLContext.new((:TLSv1)).ciphers.collect { |cipher_name, _cipher_version, _bits, _algorithm_bits| cipher_name }
-        http.ciphers = 'SRP-RSA-3DES-EDE-CBC-SHA'
+        # http.ciphers = 'SRP-RSA-3DES-EDE-CBC-SHA'
       end
 
       response = http.post(url.path, xml_string, 'Content-Type' => 'text/xml')
