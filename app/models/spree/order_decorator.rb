@@ -7,8 +7,12 @@ Spree::Order.class_eval do
            :global_collect_city, :zipcode, :state_text, :global_collect_street,
            to: :ship_address, allow_nil: true, prefix: true
 
-  def global_collect_number
+  def self.generate_global_collect_number(number)
     number.gsub(/[^0-9]/i, '')
+  end
+
+  def global_collect_number
+    self.class.generate_global_collect_number(number)
   end
 
   def global_collect_total

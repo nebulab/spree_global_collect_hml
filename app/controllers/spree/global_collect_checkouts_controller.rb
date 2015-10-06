@@ -1,19 +1,26 @@
 module Spree
   class GlobalCollectCheckoutsController < BaseController
-    before_filter :log_request, :load_global_collect_checkout, :load_payment
+    before_filter :log_request, :load_global_collect_checkout, :load_payment,
+                  :load_order
     skip_before_action :verify_authenticity_token, only: :create
 
-    rescue_from ActiveRecord::RecordNotFound, Spree::Core::GatewayError,
-                with: :render_nok
+    rescue_from Spree::Core::GatewayError, with: :render_nok
 
     def create
       return render(nothing: true) unless status_successful?
-      return render_ok             if @payment.completed?
+      return render_ok             if @payment.try(:completed?)
 
-      if @payment.complete!
-        render_ok
+      if @payment.present?
+        @payment.complete! ? render_ok : render_nok
       else
-        render_nok
+        Spree::Order.transaction do
+          @order.payments.create!(
+            source: @global_collect_checkout,
+            amount: @order.total, payment_method: @global_collect_checkout.payment_method
+          )
+
+          @order.next || fail(ActiveRecord::Rollback)
+        end
       end
     end
 
@@ -31,6 +38,10 @@ module Spree
 
     def load_payment
       @payment = @global_collect_checkout.payment
+    end
+
+    def load_order
+      @order = @global_collect_checkout.order
     end
 
     def render_ok

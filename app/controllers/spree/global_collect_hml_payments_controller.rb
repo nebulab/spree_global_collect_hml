@@ -11,23 +11,23 @@ module Spree
                 Net::ProtocolError, SocketError, with: :connection_errors
 
     def create
+      @order = current_order
       @payment_method = payment_method
 
       @response = provider.insert_orderwithpayment(
-        current_order,
-        global_collect_params[:payment_product],
+        @order, global_collect_params[:payment_product],
         global_collect_hml_payments_confirm_url(
-          global_collect: { spree_order_id: current_order.id, payment_method_id: @payment_method.id }),
+          global_collect: { spree_order_id: @order.id, payment_method_id: @payment_method.id }),
         global_collect_params[:profile_id]
       )
 
       if @response.valid?
-        store_global_collect_session_data(@response)
+        store_global_collect_data(@response, @order, @payment_method)
         redirect_to(@response[:formaction]) unless request.xhr?
       else
         session['global_collect'] = {}
         flash[:error] = Spree.t('global_collect.connection_error')
-        redirect_to checkout_state_path(current_order.state) unless request.xhr?
+        redirect_to checkout_state_path(@order.state) unless request.xhr?
       end
     end
 
@@ -36,11 +36,7 @@ module Spree
 
       Spree::Order.transaction do
         @order.payments.create!(
-          source: GlobalCollectCheckout.create(
-            order_number:      @order.global_collect_number,
-            user_id:           @order.user_id,
-            payment_method_id: payment_method.try(:id)
-          ),
+          source: GlobalCollectCheckout.where(order: @order).last!,
           amount: @order.total, payment_method: payment_method
         )
 
@@ -74,7 +70,14 @@ module Spree
       redirect_to checkout_state_path(current_order.state)
     end
 
-    def store_global_collect_session_data(response)
+    def store_global_collect_data(response, order, payment_method)
+      GlobalCollectCheckout.create(
+        order_number:   order.global_collect_number,
+        order:          order,
+        user:           order.user,
+        payment_method: payment_method
+      )
+
       session['global_collect'] = {
         'ref' => response[:ref],
         'returnmac' => response[:returnmac]
