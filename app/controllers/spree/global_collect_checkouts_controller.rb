@@ -13,13 +13,31 @@ module Spree
       if @payment.present?
         @payment.complete! ? render_ok : render_nok
       else
-        Spree::Order.transaction do
-          @order.payments.create!(
-            source: @global_collect_checkout,
-            amount: @order.total, payment_method: @global_collect_checkout.payment_method
+        Order.transaction do
+          order = Order.find(params['ORDERID'])
+
+          global_collect_checkout = GlobalCollectCheckout.create(
+            order_number:   order.global_collect_number,
+            order:          order,
+            user_id:        order.user_id,
+            payment_method_id: params[:global_collect][:payment_method_id],
           )
 
-          @order.next || fail(ActiveRecord::Rollback)
+          order.payments.create!(
+            source: global_collect_checkout,
+            amount: order.total,
+            payment_method_id: global_collect_checkout.payment_method_id,
+          )
+
+          order.next
+
+          if order.complete?
+            render_ok
+          else
+            # this will let webhooks continue trigger us until the
+            # payment is flagged as completed
+            render_nok
+          end
         end
       end
     end
@@ -33,15 +51,15 @@ module Spree
     end
 
     def load_global_collect_checkout
-      @global_collect_checkout = GlobalCollectCheckout.find_by_order_number!(params['ORDERID'])
+      @global_collect_checkout = GlobalCollectCheckout.find_by_order_number(params['ORDERID'])
     end
 
     def load_payment
-      @payment = @global_collect_checkout.payment
+      @payment = @global_collect_checkout.try(:payment)
     end
 
     def load_order
-      @order = @global_collect_checkout.order
+      @order = @global_collect_checkout.try(:order)
     end
 
     def render_ok
