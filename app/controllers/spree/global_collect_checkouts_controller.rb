@@ -19,7 +19,15 @@ module Spree
             amount: @order.total, payment_method: @global_collect_checkout.payment_method
           )
 
-          @order.next || fail(ActiveRecord::Rollback)
+          @order.next
+
+          if @order.complete?
+            render_ok
+          else
+            # this will let webhooks continue trigger us until the
+            # payment is flagged as completed
+            render_nok
+          end
         end
       end
     end
