@@ -48,8 +48,13 @@ module Spree
     def status_successful?
       return false unless params['STATUSID'].present?
 
-      # Successful if STATUSID is READY (800) or PAID (1000)
-      params['STATUSID'].to_i == 800 || params['STATUSID'].to_i == 1000
+      success_status_codes = [
+        800,  # READY
+        1000, # PAID
+        1050, # COLLECTED (used by Sofort)
+      ]
+
+      success_status_codes.include?(params['STATUSID'].to_i)
     end
 
     # A webhook is received from GlobalCollect which we don't have payments for.
