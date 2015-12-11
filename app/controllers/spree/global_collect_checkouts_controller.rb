@@ -1,7 +1,7 @@
 module Spree
   class GlobalCollectCheckoutsController < BaseController
-    before_filter :log_request, :load_global_collect_checkout, :load_payment,
-                  :load_order
+    before_filter :log_request, :load_global_collect_checkout,
+                  :load_order, :load_payment
     skip_before_action :verify_authenticity_token, only: :create
 
     rescue_from Spree::Core::GatewayError, with: :render_nok
@@ -10,25 +10,10 @@ module Spree
       return render(nothing: true) unless status_successful?
       return render_ok             if @payment.try(:completed?)
 
-      if @payment.present?
-        @payment.complete! ? render_ok : render_nok
+      if @payment.present? && @payment.complete!
+        render_ok
       else
-        Spree::Order.transaction do
-          @order.payments.create!(
-            source: @global_collect_checkout,
-            amount: @order.total, payment_method: @global_collect_checkout.payment_method
-          )
-
-          @order.next
-
-          if @order.complete?
-            render_ok
-          else
-            # this will let webhooks continue trigger us until the
-            # payment is flagged as completed
-            render_nok
-          end
-        end
+        render_nok
       end
     end
 
@@ -45,7 +30,7 @@ module Spree
     end
 
     def load_payment
-      @payment = @global_collect_checkout.payment
+      @payment = @global_collect_checkout.payment || create_payment_from_webhook
     end
 
     def load_order
@@ -65,6 +50,27 @@ module Spree
 
       # Successful if STATUSID is READY (800) or PAID (1000)
       params['STATUSID'].to_i == 800 || params['STATUSID'].to_i == 1000
+    end
+
+    # A webhook is received from GlobalCollect which we don't have payments for.
+    # This can happen when user closes the browser window after submit the
+    # payment but before coming back to the site (which will actually create
+    # the Spree::Payment in our system).
+    def create_payment_from_webhook
+      return nil if @order.nil? || !status_successful?
+
+      Spree::Order.transaction do
+        payment = @order.payments.create!(
+          source: @global_collect_checkout,
+          amount: @order.total,
+          payment_method: @global_collect_checkout.payment_method,
+        )
+
+        # Also complete the order if needed
+        @order.next if @order.can_go_to_state?('complete')
+
+        payment
+      end
     end
   end
 end
