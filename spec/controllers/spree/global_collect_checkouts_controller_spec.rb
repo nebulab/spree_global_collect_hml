@@ -37,6 +37,30 @@ describe Spree::GlobalCollectCheckoutsController do
 
         expect(response.body).to be_blank
       end
+
+      it 'returns OK when there was a previous payment failed' do
+        order                   = create(:order, number: 'R123123')
+        global_collect_checkout = create(:global_collect_payment,
+          order: order,
+          state: 'failed',
+          source: create(:global_collect_checkout,
+            order_number: '123123'
+          )
+        ).source
+
+        new_global_collect_checkout = create(:global_collect_payment,
+          order: order,
+          source: create(:global_collect_checkout,
+            order_number: '123123'
+          )
+        ).source
+
+        post :create, use_route: :spree,
+                      'ORDERID'  => new_global_collect_checkout.order_number,
+                      'STATUSID' => 800
+
+        expect(response.body).to eql "OK\n"
+      end
     end
   end
 end

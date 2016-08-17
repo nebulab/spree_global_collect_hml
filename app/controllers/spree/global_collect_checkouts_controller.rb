@@ -26,7 +26,7 @@ module Spree
     end
 
     def load_global_collect_checkout
-      @global_collect_checkout = GlobalCollectCheckout.find_by_order_number!(params['ORDERID'])
+      @global_collect_checkout = GlobalCollectCheckout.where(order_number: params['ORDERID']).last!
     end
 
     def load_payment
