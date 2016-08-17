@@ -10,7 +10,7 @@ module Spree
       return render(nothing: true) unless status_successful?
       return render_ok             if @payment.completed?
 
-      if @payment.complete!
+      if @payment.present? && @payment.can_complete? && @payment.complete!
         render_ok
       else
         render_nok
