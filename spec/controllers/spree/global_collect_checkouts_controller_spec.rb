@@ -44,20 +44,23 @@ describe Spree::GlobalCollectCheckoutsController do
           order: order,
           state: 'failed',
           source: create(:global_collect_checkout,
-            order_number: '123123'
+            order_number: '123123',
+            attempt_id: '1'
           )
         ).source
 
         new_global_collect_checkout = create(:global_collect_payment,
           order: order,
           source: create(:global_collect_checkout,
-            order_number: '123123'
+            order_number: '123123',
+            attempt_id: '2'
           )
         ).source
 
         post :create, use_route: :spree,
                       'ORDERID'  => new_global_collect_checkout.order_number,
-                      'STATUSID' => 800
+                      'STATUSID' => 800,
+                      'ATTEMPTID' => 2
 
         expect(response.body).to eql "OK\n"
       end

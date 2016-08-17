@@ -26,7 +26,10 @@ module Spree
     end
 
     def load_global_collect_checkout
-      @global_collect_checkout = GlobalCollectCheckout.where(order_number: params['ORDERID']).last!
+      gc_checkout_params_conditions = { order_number: params['ORDERID'] }
+      gc_checkout_params_conditions[:attempt_id] = params['ATTEMPTID'] if params['ATTEMPTID']
+
+      @global_collect_checkout = GlobalCollectCheckout.where(gc_checkout_params_conditions).last!
     end
 
     def load_payment
